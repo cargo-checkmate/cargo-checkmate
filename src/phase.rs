@@ -32,18 +32,32 @@ impl Runner {
         print!("Phase {}... ", subcommand);
         let output = Command::new("cargo").arg(subcommand).args(args).output()?;
 
-        self.write_log(subcommand, "stderr", &output.stderr)?;
-        self.write_log(subcommand, "stdout", &output.stdout)?;
+        let outlog = self.log_path(subcommand, "stdout");
+        let errlog = self.log_path(subcommand, "stderr");
+
+        {
+            use std::fs::File;
+            use std::io::Write;
+
+            File::create(&errlog)?.write_all(&output.stderr)?;
+            File::create(&outlog)?.write_all(&output.stdout)?;
+        }
 
         if output.status.success() {
-            println!("{}", "ok.");
+            println!("ok.");
         } else {
             use std::io::Write;
 
-            println!("{}", "FAILED.");
             self.success = false;
-            std::io::stdout().write_all(&output.stdout)?;
-            std::io::stdout().write_all(&output.stderr)?;
+            println!("FAILED:");
+
+            let mut stdout = std::io::stdout();
+
+            println!("{}:", outlog.display());
+            stdout.write_all(&output.stdout)?;
+
+            println!("{:?}:", errlog.display());
+            stdout.write_all(&output.stderr)?;
         }
 
         Ok(())
@@ -53,12 +67,7 @@ impl Runner {
         std::process::exit(if self.success { 0 } else { 1 })
     }
 
-    fn write_log(&self, subcommand: &str, outkind: &str, bytes: &[u8]) -> std::io::Result<()> {
-        use std::io::Write;
-
-        let outpath = self.logdir.join(&format!("{}.{}", subcommand, outkind));
-        let mut f = std::fs::File::create(outpath)?;
-        f.write_all(bytes)?;
-        Ok(())
+    fn log_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
+        self.logdir.join(&format!("{}.{}", subcommand, outkind))
     }
 }
