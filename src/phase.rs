@@ -46,18 +46,19 @@ impl Runner {
         if output.status.success() {
             println!("ok.");
         } else {
+            use crate::indenter::Indenter;
             use std::io::Write;
 
             self.success = false;
             println!("FAILED:");
 
-            let mut stdout = std::io::stdout();
+            let mut f = Indenter::from(std::io::stdout());
 
             println!("{}:", outlog.display());
-            stdout.write_all(&output.stdout)?;
+            f.write_all(&output.stdout)?;
 
             println!("{:?}:", errlog.display());
-            stdout.write_all(&output.stderr)?;
+            f.write_all(&output.stderr)?;
         }
 
         Ok(())
