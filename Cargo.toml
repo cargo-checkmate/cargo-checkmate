@@ -8,3 +8,6 @@ description = "Cargo Check All The Things - comprehensive out-of-the-box safety 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[dev-dependencies]
+test-case = "1.0.0"

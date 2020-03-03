@@ -1,6 +1,5 @@
 #![deny(warnings)]
 
-mod indenter;
 mod phase;
 
 fn main() -> std::io::Result<()> {

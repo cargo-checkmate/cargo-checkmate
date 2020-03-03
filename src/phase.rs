@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+mod indenter;
+
 pub struct Runner {
     success: bool,
     logdir: PathBuf,
@@ -46,7 +48,7 @@ impl Runner {
         if output.status.success() {
             println!("ok.");
         } else {
-            use crate::indenter::Indenter;
+            use self::indenter::Indenter;
             use std::io::Write;
 
             self.success = false;
@@ -54,10 +56,10 @@ impl Runner {
 
             let mut f = Indenter::from(std::io::stdout());
 
-            println!("{}:", outlog.display());
+            println!("+ {}:", outlog.display());
             f.write_all(&output.stdout)?;
 
-            println!("{:?}:", errlog.display());
+            println!("+ {}:", errlog.display());
             f.write_all(&output.stderr)?;
         }
 
