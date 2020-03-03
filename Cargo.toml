@@ -1,9 +1,9 @@
 [package]
-name = "cargo-catt"
+name = "cargo-checkmate"
 version = "0.1.0"
 authors = ["nathan <nathan+dev@electriccoin.co>"]
 edition = "2018"
-description = "Cargo Check All The Things - comprehensive out-of-the-box safety & hygiene checks."
+description = "checkmate checks all the things - comprehensive out-of-the-box safety & hygiene checks."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

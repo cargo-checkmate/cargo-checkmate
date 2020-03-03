@@ -14,7 +14,7 @@ impl Runner {
                 .ok()
                 .unwrap_or(".".to_string()),
             "target",
-            "cargo-catt",
+            env!("CARGO_PKG_NAME"),
             "logs",
         ]
         .iter()
