@@ -2,10 +2,8 @@
 
 mod phase;
 
+const PHASES: &[(&str, &[&str])] = &[("build", &[]), ("test", &[])];
+
 fn main() -> std::io::Result<()> {
-    let mut runner = phase::Runner::new()?;
-    runner.run_phase("build", &[])?;
-    runner.run_phase("test", &[])?;
-    runner.exit();
-    Ok(())
+    phase::run_phases(PHASES)
 }

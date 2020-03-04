@@ -1,14 +1,32 @@
+use std::io::Result;
 use std::path::PathBuf;
 
 mod indenter;
 
-pub struct Runner {
-    success: bool,
+pub fn run_phases(phases: &[(&str, &[&str])]) -> Result<()> {
+    let mut runner = Runner::new()?;
+
+    println!(
+        "\nrunning {} {} phases",
+        phases.len(),
+        env!("CARGO_PKG_NAME")
+    );
+
+    for (name, args) in phases {
+        runner.run_phase(name, args)?;
+    }
+
+    runner.exit()
+}
+
+struct Runner {
     logdir: PathBuf,
+    passcount: usize,
+    failcount: usize,
 }
 
 impl Runner {
-    pub fn new() -> std::io::Result<Runner> {
+    fn new() -> Result<Runner> {
         let logdir = [
             &std::env::var("CARGO_MANIFEST_DIR")
                 .ok()
@@ -23,15 +41,16 @@ impl Runner {
         std::fs::create_dir_all(&logdir)?;
 
         Ok(Runner {
-            success: true,
             logdir: logdir,
+            passcount: 0,
+            failcount: 0,
         })
     }
 
-    pub fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> std::io::Result<()> {
+    fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
         use std::process::Command;
 
-        print!("Phase {}... ", subcommand);
+        print!("{} {}... ", env!("CARGO_PKG_NAME"), subcommand);
         let output = Command::new("cargo").arg(subcommand).args(args).output()?;
 
         let outlog = self.log_path(subcommand, "stdout");
@@ -46,12 +65,13 @@ impl Runner {
         }
 
         if output.status.success() {
+            self.passcount += 1;
             println!("ok.");
         } else {
             use self::indenter::Indenter;
             use std::io::Write;
 
-            self.success = false;
+            self.failcount += 1;
             println!("FAILED:");
 
             let mut f = Indenter::from(std::io::stdout());
@@ -66,8 +86,19 @@ impl Runner {
         Ok(())
     }
 
-    pub fn exit(&self) {
-        std::process::exit(if self.success { 0 } else { 1 })
+    fn exit(&self) -> Result<()> {
+        println!(
+            "\n{} result: {}. {} passed; {} failed",
+            env!("CARGO_PKG_NAME"),
+            if self.success() { "ok" } else { "FAILED" },
+            self.passcount,
+            self.failcount
+        );
+        std::process::exit(if self.success() { 0 } else { 1 });
+    }
+
+    fn success(&self) -> bool {
+        self.failcount == 0
     }
 
     fn log_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
