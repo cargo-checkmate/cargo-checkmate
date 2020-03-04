@@ -68,19 +68,10 @@ impl Runner {
             self.passcount += 1;
             println!("ok.");
         } else {
-            use self::indenter::Indenter;
-            use std::io::Write;
-
             self.failcount += 1;
             println!("FAILED:");
 
-            let mut f = Indenter::from(std::io::stdout());
-
-            println!("+ {}:", outlog.display());
-            f.write_all(&output.stdout)?;
-
-            println!("+ {}:", errlog.display());
-            f.write_all(&output.stderr)?;
+            self.display_failure_log(subcommand, outlog, errlog)?;
         }
 
         Ok(())
@@ -103,5 +94,23 @@ impl Runner {
 
     fn log_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
         self.logdir.join(&format!("{}.{}", subcommand, outkind))
+    }
+
+    fn display_failure_log(
+        &self,
+        _subcommand: &str,
+        outlog: PathBuf,
+        errlog: PathBuf,
+    ) -> Result<()> {
+        use self::indenter::Indenter;
+        use std::fs::File;
+        use std::io::{copy, stdout};
+
+        for logpath in &[outlog, errlog] {
+            println!("+ {}:", logpath.display());
+            copy(&mut File::open(logpath)?, &mut Indenter::from(stdout()))?;
+        }
+
+        Ok(())
     }
 }
