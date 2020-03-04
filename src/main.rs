@@ -1,9 +1,8 @@
 #![deny(warnings)]
 
-mod phase;
-
-const PHASES: &[(&str, &[&str])] = &[("build", &[]), ("test", &[])];
+mod phases;
+mod runner;
 
 fn main() -> std::io::Result<()> {
-    phase::run_phases(PHASES)
+    runner::run(phases::PHASES)
 }

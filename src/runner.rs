@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 mod indenter;
 
-pub fn run_phases(phases: &[(&str, &[&str])]) -> Result<()> {
+pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
     let mut runner = Runner::new()?;
 
     println!(
