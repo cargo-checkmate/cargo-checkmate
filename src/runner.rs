@@ -1,16 +1,14 @@
+use crate::CMDNAME;
 use std::io::Result;
 use std::path::PathBuf;
 
-mod indenter;
+mod phaseresult;
+use phaseresult::PhaseResult;
 
 pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
     let mut runner = Runner::new()?;
 
-    println!(
-        "\nrunning {} {} phases",
-        phases.len(),
-        env!("CARGO_PKG_NAME")
-    );
+    println!("\nrunning {} {} phases", phases.len(), CMDNAME,);
 
     for (name, args) in phases {
         runner.run_phase(name, args)?;
@@ -21,8 +19,8 @@ pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
 
 struct Runner {
     logdir: PathBuf,
-    passcount: usize,
-    failcount: usize,
+    passes: Vec<PhaseResult>,
+    fails: Vec<PhaseResult>,
 }
 
 impl Runner {
@@ -32,7 +30,7 @@ impl Runner {
                 .ok()
                 .unwrap_or(".".to_string()),
             "target",
-            env!("CARGO_PKG_NAME"),
+            CMDNAME,
             "logs",
         ]
         .iter()
@@ -42,15 +40,15 @@ impl Runner {
 
         Ok(Runner {
             logdir: logdir,
-            passcount: 0,
-            failcount: 0,
+            passes: vec![],
+            fails: vec![],
         })
     }
 
     fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
         use std::process::Command;
 
-        print!("{} {}... ", env!("CARGO_PKG_NAME"), subcommand);
+        print!("{} {}... ", CMDNAME, subcommand);
         let output = Command::new("cargo").arg(subcommand).args(args).output()?;
 
         let outlog = self.log_path(subcommand, "stdout");
@@ -64,53 +62,44 @@ impl Runner {
             File::create(&outlog)?.write_all(&output.stdout)?;
         }
 
-        if output.status.success() {
-            self.passcount += 1;
+        let results = if output.status.success() {
             println!("ok.");
+            &mut self.passes
         } else {
-            self.failcount += 1;
-            println!("FAILED:");
+            println!("FAILED.");
+            &mut self.fails
+        };
 
-            self.display_failure_log(subcommand, outlog, errlog)?;
-        }
+        results.push(PhaseResult::new(subcommand, outlog, errlog));
 
         Ok(())
     }
 
-    fn exit(&self) -> Result<()> {
+    fn exit(self) -> Result<()> {
+        let passcount = self.passes.len();
+        let failcount = self.fails.len();
+
+        let (exitstatus, label) = if failcount == 0 {
+            (0, "ok")
+        } else {
+            println!("\nfailures:\n");
+
+            for fres in self.fails {
+                fres.display()?;
+            }
+
+            (1, "FAILED")
+        };
+
         println!(
             "\n{} result: {}. {} passed; {} failed",
-            env!("CARGO_PKG_NAME"),
-            if self.success() { "ok" } else { "FAILED" },
-            self.passcount,
-            self.failcount
+            CMDNAME, label, passcount, failcount,
         );
-        std::process::exit(if self.success() { 0 } else { 1 });
-    }
 
-    fn success(&self) -> bool {
-        self.failcount == 0
+        std::process::exit(exitstatus);
     }
 
     fn log_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
         self.logdir.join(&format!("{}.{}", subcommand, outkind))
-    }
-
-    fn display_failure_log(
-        &self,
-        _subcommand: &str,
-        outlog: PathBuf,
-        errlog: PathBuf,
-    ) -> Result<()> {
-        use self::indenter::Indenter;
-        use std::fs::File;
-        use std::io::{copy, stdout};
-
-        for logpath in &[outlog, errlog] {
-            println!("+ {}:", logpath.display());
-            copy(&mut File::open(logpath)?, &mut Indenter::from(stdout()))?;
-        }
-
-        Ok(())
     }
 }
