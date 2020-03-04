@@ -1,1 +1,2 @@
-pub const PHASES: &[(&str, &[&str])] = &[("build", &[]), ("test", &[])];
+pub const PHASES: &[(&str, &[&str])] =
+    &[("fmt", &["--", "--check"]), ("build", &[]), ("test", &[])];
