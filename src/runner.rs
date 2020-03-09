@@ -18,31 +18,32 @@ pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
 }
 
 struct Runner {
-    logdir: PathBuf,
+    repodir: PathBuf,
+    rellogdir: PathBuf,
     passes: Vec<PhaseResult>,
     fails: Vec<PhaseResult>,
 }
 
 impl Runner {
     fn new() -> Result<Runner> {
-        let logdir = [
-            &std::env::var("CARGO_MANIFEST_DIR")
+        let repodir = PathBuf::from(
+            std::env::var("CARGO_MANIFEST_DIR")
                 .ok()
                 .unwrap_or(".".to_string()),
-            "target",
-            CMDNAME,
-            "logs",
-        ]
-        .iter()
-        .collect();
+        );
 
-        std::fs::create_dir_all(&logdir)?;
+        let rellogdir = [".", "target", CMDNAME, "logs"].iter().collect();
 
-        Ok(Runner {
-            logdir: logdir,
+        let myself = Runner {
+            repodir: repodir,
+            rellogdir: rellogdir,
             passes: vec![],
             fails: vec![],
-        })
+        };
+
+        std::fs::create_dir_all(&myself.logdir())?;
+
+        Ok(myself)
     }
 
     fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
@@ -100,6 +101,10 @@ impl Runner {
     }
 
     fn log_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
-        self.logdir.join(&format!("{}.{}", subcommand, outkind))
+        self.logdir().join(&format!("{}.{}", subcommand, outkind))
+    }
+
+    fn logdir(&self) -> PathBuf {
+        self.repodir.join(&self.rellogdir)
     }
 }
