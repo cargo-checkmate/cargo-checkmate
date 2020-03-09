@@ -24,10 +24,19 @@ impl PhaseResult {
         use std::fs::File;
         use std::io::{copy, stdout};
 
+        let mut empty = true;
+
         println!("---- {} {} ----", crate::CMDNAME, self.name);
         for logpath in &[self.outlog, self.errlog] {
-            println!("+ {}:", logpath.display());
-            copy(&mut File::open(logpath)?, &mut Indenter::from(stdout()))?;
+            if logpath.metadata()?.len() > 0 {
+                empty = false;
+                println!("+ {}:", logpath.display());
+                copy(&mut File::open(logpath)?, &mut Indenter::from(stdout()))?;
+            }
+        }
+
+        if empty {
+            println!("+ No output.");
         }
 
         Ok(())
