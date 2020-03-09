@@ -18,7 +18,7 @@ pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
 }
 
 struct Runner {
-    repodir: PathBuf,
+    cratedir: PathBuf,
     rellogdir: PathBuf,
     passes: Vec<PhaseResult>,
     fails: Vec<PhaseResult>,
@@ -26,7 +26,7 @@ struct Runner {
 
 impl Runner {
     fn new() -> Result<Runner> {
-        let repodir = PathBuf::from(
+        let cratedir = PathBuf::from(
             std::env::var("CARGO_MANIFEST_DIR")
                 .ok()
                 .unwrap_or(".".to_string()),
@@ -34,10 +34,10 @@ impl Runner {
 
         let rellogdir = [".", "target", CMDNAME, "logs"].iter().collect();
 
-        std::fs::create_dir_all(&repodir.join(&rellogdir))?;
+        std::fs::create_dir_all(&cratedir.join(&rellogdir))?;
 
         Ok(Runner {
-            repodir: repodir,
+            cratedir: cratedir,
             rellogdir: rellogdir,
             passes: vec![],
             fails: vec![],
@@ -57,8 +57,8 @@ impl Runner {
             use std::fs::File;
             use std::io::Write;
 
-            File::create(&self.repodir.join(&relerrlog))?.write_all(&output.stderr)?;
-            File::create(&self.repodir.join(&reloutlog))?.write_all(&output.stdout)?;
+            File::create(&self.cratedir.join(&relerrlog))?.write_all(&output.stderr)?;
+            File::create(&self.cratedir.join(&reloutlog))?.write_all(&output.stdout)?;
         }
 
         let results = if output.status.success() {
@@ -71,7 +71,7 @@ impl Runner {
 
         results.push(PhaseResult::new(
             subcommand,
-            self.repodir.clone(),
+            self.cratedir.clone(),
             reloutlog,
             relerrlog,
         ));
