@@ -34,16 +34,14 @@ impl Runner {
 
         let rellogdir = [".", "target", CMDNAME, "logs"].iter().collect();
 
-        let myself = Runner {
+        std::fs::create_dir_all(&repodir.join(&rellogdir))?;
+
+        Ok(Runner {
             repodir: repodir,
             rellogdir: rellogdir,
             passes: vec![],
             fails: vec![],
-        };
-
-        std::fs::create_dir_all(&myself.logdir())?;
-
-        Ok(myself)
+        })
     }
 
     fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
@@ -52,15 +50,15 @@ impl Runner {
         print!("{} {}... ", CMDNAME, subcommand);
         let output = Command::new("cargo").arg(subcommand).args(args).output()?;
 
-        let outlog = self.log_path(subcommand, "stdout");
-        let errlog = self.log_path(subcommand, "stderr");
+        let reloutlog = self.rellog_path(subcommand, "stdout");
+        let relerrlog = self.rellog_path(subcommand, "stderr");
 
         {
             use std::fs::File;
             use std::io::Write;
 
-            File::create(&errlog)?.write_all(&output.stderr)?;
-            File::create(&outlog)?.write_all(&output.stdout)?;
+            File::create(&self.repodir.join(&relerrlog))?.write_all(&output.stderr)?;
+            File::create(&self.repodir.join(&reloutlog))?.write_all(&output.stdout)?;
         }
 
         let results = if output.status.success() {
@@ -71,7 +69,12 @@ impl Runner {
             &mut self.fails
         };
 
-        results.push(PhaseResult::new(subcommand, outlog, errlog));
+        results.push(PhaseResult::new(
+            subcommand,
+            self.repodir.clone(),
+            reloutlog,
+            relerrlog,
+        ));
 
         Ok(())
     }
@@ -100,11 +103,7 @@ impl Runner {
         std::process::exit(exitstatus);
     }
 
-    fn log_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
-        self.logdir().join(&format!("{}.{}", subcommand, outkind))
-    }
-
-    fn logdir(&self) -> PathBuf {
-        self.repodir.join(&self.rellogdir)
+    fn rellog_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
+        self.rellogdir.join(&format!("{}.{}", subcommand, outkind))
     }
 }

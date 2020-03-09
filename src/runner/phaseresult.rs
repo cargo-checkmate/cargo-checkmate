@@ -5,15 +5,17 @@ mod indenter;
 
 pub struct PhaseResult {
     name: String,
+    repodir: PathBuf,
     outlog: PathBuf,
     errlog: PathBuf,
 }
 
 impl PhaseResult {
-    pub fn new(name: &str, outlog: PathBuf, errlog: PathBuf) -> PhaseResult {
+    pub fn new(name: &str, repodir: PathBuf, outlog: PathBuf, errlog: PathBuf) -> PhaseResult {
         let name = String::from(name);
         PhaseResult {
             name,
+            repodir,
             outlog,
             errlog,
         }
@@ -27,10 +29,11 @@ impl PhaseResult {
         let mut empty = true;
 
         println!("---- {} {} ----", crate::CMDNAME, self.name);
-        for logpath in &[self.outlog, self.errlog] {
+        for rellogpath in &[self.outlog, self.errlog] {
+            let logpath = self.repodir.join(rellogpath);
             if logpath.metadata()?.len() > 0 {
                 empty = false;
-                println!("+ {}:", logpath.display());
+                println!("+ {}:", rellogpath.display());
                 copy(&mut File::open(logpath)?, &mut Indenter::from(stdout()))?;
             }
         }
