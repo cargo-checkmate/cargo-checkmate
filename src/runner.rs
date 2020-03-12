@@ -55,6 +55,12 @@ impl Runner {
         use std::process::Command;
 
         print!("{} {}... ", CMDNAME, subcommand);
+
+        {
+            use std::io::Write;
+            std::io::stdout().flush()?;
+        }
+
         let output = Command::new("cargo").arg(subcommand).args(args).output()?;
 
         let reloutlog = self.rellog_path(subcommand, "stdout");
