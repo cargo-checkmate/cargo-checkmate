@@ -54,7 +54,14 @@ impl Runner {
     fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
         use std::process::Command;
 
-        print!("{} {}... ", CMDNAME, subcommand);
+        let phasename = if subcommand == "checkmate" {
+            assert!(args.len() > 0);
+            args[0]
+        } else {
+            subcommand
+        };
+
+        print!("{} {}... ", CMDNAME, phasename);
 
         {
             use std::io::Write;
@@ -63,8 +70,8 @@ impl Runner {
 
         let output = Command::new("cargo").arg(subcommand).args(args).output()?;
 
-        let reloutlog = self.rellog_path(subcommand, "stdout");
-        let relerrlog = self.rellog_path(subcommand, "stderr");
+        let reloutlog = self.rellog_path(phasename, "stdout");
+        let relerrlog = self.rellog_path(phasename, "stderr");
 
         {
             use std::fs::File;
@@ -83,7 +90,7 @@ impl Runner {
         };
 
         results.push(PhaseResult::new(
-            subcommand,
+            phasename,
             self.cratedir.clone(),
             reloutlog,
             relerrlog,
@@ -116,7 +123,7 @@ impl Runner {
         std::process::exit(exitstatus);
     }
 
-    fn rellog_path(&self, subcommand: &str, outkind: &str) -> PathBuf {
-        self.rellogdir.join(&format!("{}.{}", subcommand, outkind))
+    fn rellog_path(&self, phasename: &str, outkind: &str) -> PathBuf {
+        self.rellogdir.join(&format!("{}.{}", phasename, outkind))
     }
 }
