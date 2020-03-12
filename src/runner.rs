@@ -54,11 +54,11 @@ impl Runner {
     fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
         use std::process::Command;
 
-        let phasename = if subcommand == "checkmate" {
+        let (phasename, exec) = if subcommand == "checkmate" {
             assert!(args.len() > 0);
-            args[0]
+            (args[0], std::env::current_exe()?)
         } else {
-            subcommand
+            (subcommand, PathBuf::from("cargo"))
         };
 
         print!("{} {}... ", CMDNAME, phasename);
@@ -68,7 +68,7 @@ impl Runner {
             std::io::stdout().flush()?;
         }
 
-        let output = Command::new("cargo").arg(subcommand).args(args).output()?;
+        let output = Command::new(exec).arg(subcommand).args(args).output()?;
 
         let reloutlog = self.rellog_path(phasename, "stdout");
         let relerrlog = self.rellog_path(phasename, "stderr");
