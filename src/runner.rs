@@ -32,9 +32,16 @@ impl Runner {
                 .unwrap_or(".".to_string()),
         );
 
-        let rellogdir = [".", "target", CMDNAME, "logs"].iter().collect();
+        let rellogdir: PathBuf = [".", "target", CMDNAME, "logs"].iter().collect();
 
-        std::fs::create_dir_all(&cratedir.join(&rellogdir))?;
+        {
+            let logdir = &cratedir.join(&rellogdir);
+            if logdir.exists() {
+                println!("Removing prior log directory: {}", &rellogdir.display());
+                std::fs::remove_dir_all(logdir)?;
+            }
+            std::fs::create_dir_all(logdir)?;
+        }
 
         Ok(Runner {
             cratedir: cratedir,
