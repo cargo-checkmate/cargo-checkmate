@@ -18,7 +18,6 @@ pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
 }
 
 struct Runner {
-    cratedir: PathBuf,
     rellogdir: PathBuf,
     passes: Vec<PhaseResult>,
     fails: Vec<PhaseResult>,
@@ -26,25 +25,17 @@ struct Runner {
 
 impl Runner {
     fn new() -> Result<Runner> {
-        let cratedir = PathBuf::from(
-            std::env::var("CARGO_MANIFEST_DIR")
-                .ok()
-                .unwrap_or(".".to_string()),
-        );
-
         let rellogdir: PathBuf = [".", "target", CMDNAME, "logs"].iter().collect();
 
         {
-            let logdir = &cratedir.join(&rellogdir);
-            if logdir.exists() {
+            if rellogdir.exists() {
                 println!("Removing prior log directory: {}", &rellogdir.display());
-                std::fs::remove_dir_all(logdir)?;
+                std::fs::remove_dir_all(&rellogdir)?;
             }
-            std::fs::create_dir_all(logdir)?;
+            std::fs::create_dir_all(&rellogdir)?;
         }
 
         Ok(Runner {
-            cratedir: cratedir,
             rellogdir: rellogdir,
             passes: vec![],
             fails: vec![],
@@ -77,8 +68,8 @@ impl Runner {
             use std::fs::File;
             use std::io::Write;
 
-            File::create(&self.cratedir.join(&relerrlog))?.write_all(&output.stderr)?;
-            File::create(&self.cratedir.join(&reloutlog))?.write_all(&output.stdout)?;
+            File::create(&relerrlog)?.write_all(&output.stderr)?;
+            File::create(&reloutlog)?.write_all(&output.stdout)?;
         }
 
         let results = if output.status.success() {
@@ -89,12 +80,7 @@ impl Runner {
             &mut self.fails
         };
 
-        results.push(PhaseResult::new(
-            phasename,
-            self.cratedir.clone(),
-            reloutlog,
-            relerrlog,
-        ));
+        results.push(PhaseResult::new(phasename, reloutlog, relerrlog));
 
         Ok(())
     }
