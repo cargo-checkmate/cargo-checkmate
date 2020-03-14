@@ -7,9 +7,6 @@ mod phases;
 mod runner;
 mod subcommands;
 
-#[cfg(test)]
-mod tfi;
-
 pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
 
 const CMDNAME: &'static str = env!("CARGO_PKG_NAME");
