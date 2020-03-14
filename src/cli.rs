@@ -1,4 +1,4 @@
-use std::io::Result as IOResult;
+use crate::{invalid_input, IOResult};
 
 pub enum Command {
     Everything,
@@ -36,13 +36,4 @@ where
 
 fn optstr(x: &Option<String>) -> Option<&str> {
     x.as_ref().map(String::as_str)
-}
-
-fn invalid_input<T>(reason: &str, input: &str) -> IOResult<T> {
-    use std::io::{Error, ErrorKind};
-
-    Err(Error::new(
-        ErrorKind::InvalidInput,
-        format!("{}: {:?}", reason, input),
-    ))
 }
