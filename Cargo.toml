@@ -10,6 +10,7 @@ description = "checkmate checks all the things - comprehensive out-of-the-box sa
 [dependencies]
 abscissa_core = "0.5.2"
 cargo-audit = "0.11.2"
+enum-iterator = "0.6.0"
 
 [dev-dependencies]
 test-case = "1.0.0"

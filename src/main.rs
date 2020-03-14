@@ -1,7 +1,7 @@
 #![deny(warnings)]
 
 mod cdcrate;
-mod cli;
+mod check;
 mod iohelpers;
 mod phases;
 mod runner;
@@ -12,12 +12,13 @@ pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
 const CMDNAME: &'static str = env!("CARGO_PKG_NAME");
 
 fn main() -> IOResult<()> {
-    use crate::cli::{parse_args, Command::*};
+    use crate::check::Check;
 
     crate::cdcrate::change_directory_to_crate_root()?;
 
-    match parse_args(std::env::args())? {
-        Everything => runner::run(phases::PHASES),
-        Audit => subcommands::audit(),
+    match Check::parse_args(std::env::args())? {
+        Check::Everything => runner::run(phases::PHASES),
+        Check::Audit => subcommands::audit(),
+        other => unimplemented!("check {}", other),
     }
 }
