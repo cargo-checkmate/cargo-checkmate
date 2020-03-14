@@ -56,10 +56,15 @@ impl Check {
     }
 
     pub fn execute(&self) -> IOResult<()> {
+        use crate::subcommands::{audit, cargo_builtin};
+
         match self {
             Check::Everything => self.execute_everything(),
-            Check::Audit => crate::subcommands::audit(),
-            _ => self.execute_cargo_builtin(),
+            Check::Audit => audit(),
+            Check::Build => cargo_builtin(&["build"]),
+            Check::Check => cargo_builtin(&["check"]),
+            Check::Format => cargo_builtin(&["fmt", "--", "--check"]),
+            Check::Test => cargo_builtin(&["test"]),
         }
     }
 
@@ -82,24 +87,6 @@ impl Check {
         }
 
         runner.exit()
-    }
-
-    fn execute_cargo_builtin(&self) -> IOResult<()> {
-        use std::process::{exit, Command};
-
-        let cargoargs = self.cargo_builtin_args().expect("Not a cargo builtin.");
-        let status = Command::new("cargo").args(cargoargs).status()?;
-        exit(status.code().unwrap_or(-1));
-    }
-
-    fn cargo_builtin_args(&self) -> Option<&'static [&'static str]> {
-        match self {
-            Check::Build => Some(&["build"]),
-            Check::Check => Some(&["check"]),
-            Check::Format => Some(&["fmt", "--", "--check"]),
-            Check::Test => Some(&["test"]),
-            _ => None,
-        }
     }
 }
 
