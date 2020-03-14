@@ -3,7 +3,6 @@
 mod cdcrate;
 mod check;
 mod iohelpers;
-mod phases;
 mod runner;
 mod subcommands;
 
@@ -15,10 +14,6 @@ fn main() -> IOResult<()> {
     use crate::check::Check;
 
     crate::cdcrate::change_directory_to_crate_root()?;
-
-    match Check::parse_args(std::env::args())? {
-        Check::Everything => runner::run(phases::PHASES),
-        Check::Audit => subcommands::audit(),
-        other => unimplemented!("check {}", other),
-    }
+    let check = Check::parse_args(std::env::args())?;
+    check.execute()
 }

@@ -4,12 +4,12 @@ use std::fmt;
 
 #[derive(Debug, IntoEnumIterator)]
 pub enum Check {
-    Audit,
-    Build,
-    Check,
     Everything,
+    Check,
     Format,
+    Build,
     Test,
+    Audit,
 }
 
 impl Check {
@@ -53,6 +53,53 @@ impl Check {
         }
 
         invalid_input("Unknown check", checkname)
+    }
+
+    pub fn execute(&self) -> IOResult<()> {
+        match self {
+            Check::Everything => self.execute_everything(),
+            Check::Audit => crate::subcommands::audit(),
+            _ => self.execute_cargo_builtin(),
+        }
+    }
+
+    fn execute_everything(&self) -> IOResult<()> {
+        use crate::runner::Runner;
+
+        let mut runner = Runner::new()?;
+
+        println!(
+            "\nrunning {} {} phases",
+            Check::VARIANT_COUNT - 1,
+            crate::CMDNAME
+        );
+
+        for check in Check::into_enum_iter() {
+            match check {
+                Check::Everything => {}
+                _ => runner.run_check(&format!("{}", check))?,
+            }
+        }
+
+        runner.exit()
+    }
+
+    fn execute_cargo_builtin(&self) -> IOResult<()> {
+        use std::process::{exit, Command};
+
+        let cargoargs = self.cargo_builtin_args().expect("Not a cargo builtin.");
+        let status = Command::new("cargo").args(cargoargs).status()?;
+        exit(status.code().unwrap_or(-1));
+    }
+
+    fn cargo_builtin_args(&self) -> Option<&'static [&'static str]> {
+        match self {
+            Check::Build => Some(&["build"]),
+            Check::Check => Some(&["check"]),
+            Check::Format => Some(&["fmt", "--", "--check"]),
+            Check::Test => Some(&["test"]),
+            _ => None,
+        }
     }
 }
 

@@ -5,26 +5,14 @@ use std::path::PathBuf;
 mod phaseresult;
 use phaseresult::PhaseResult;
 
-pub fn run(phases: &[(&str, &[&str])]) -> Result<()> {
-    let mut runner = Runner::new()?;
-
-    println!("\nrunning {} {} phases", phases.len(), CMDNAME,);
-
-    for (name, args) in phases {
-        runner.run_phase(name, args)?;
-    }
-
-    runner.exit()
-}
-
-struct Runner {
+pub struct Runner {
     rellogdir: PathBuf,
     passes: Vec<PhaseResult>,
     fails: Vec<PhaseResult>,
 }
 
 impl Runner {
-    fn new() -> Result<Runner> {
+    pub fn new() -> Result<Runner> {
         let rellogdir: PathBuf = [".", "target", CMDNAME, "logs"].iter().collect();
 
         {
@@ -42,27 +30,22 @@ impl Runner {
         })
     }
 
-    fn run_phase(&mut self, subcommand: &str, args: &[&str]) -> Result<()> {
+    pub fn run_check(&mut self, checkname: &str) -> Result<()> {
         use std::process::Command;
 
-        let (phasename, exec) = if subcommand == "checkmate" {
-            assert!(args.len() > 0);
-            (args[0], std::env::current_exe()?)
-        } else {
-            (subcommand, PathBuf::from("cargo"))
-        };
+        let exec = std::env::current_exe()?;
 
-        print!("{} {}... ", CMDNAME, phasename);
+        print!("{} {}... ", CMDNAME, checkname);
 
         {
             use std::io::Write;
             std::io::stdout().flush()?;
         }
 
-        let output = Command::new(exec).arg(subcommand).args(args).output()?;
+        let output = Command::new(exec).arg(checkname).output()?;
 
-        let reloutlog = self.rellog_path(phasename, "stdout");
-        let relerrlog = self.rellog_path(phasename, "stderr");
+        let reloutlog = self.rellog_path(checkname, "stdout");
+        let relerrlog = self.rellog_path(checkname, "stderr");
 
         {
             use std::fs::File;
@@ -80,12 +63,12 @@ impl Runner {
             &mut self.fails
         };
 
-        results.push(PhaseResult::new(phasename, reloutlog, relerrlog));
+        results.push(PhaseResult::new(checkname, reloutlog, relerrlog));
 
         Ok(())
     }
 
-    fn exit(self) -> Result<()> {
+    pub fn exit(self) -> Result<()> {
         let passcount = self.passes.len();
         let failcount = self.fails.len();
 
@@ -109,7 +92,7 @@ impl Runner {
         std::process::exit(exitstatus);
     }
 
-    fn rellog_path(&self, phasename: &str, outkind: &str) -> PathBuf {
-        self.rellogdir.join(&format!("{}.{}", phasename, outkind))
+    fn rellog_path(&self, checkname: &str, outkind: &str) -> PathBuf {
+        self.rellogdir.join(&format!("{}.{}", checkname, outkind))
     }
 }
