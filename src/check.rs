@@ -9,6 +9,7 @@ pub enum Check {
     Format,
     Build,
     Test,
+    Doc,
     Audit,
 }
 
@@ -63,6 +64,7 @@ impl Check {
             Check::Audit => audit(),
             Check::Build => cargo_builtin(&["build"]),
             Check::Check => cargo_builtin(&["check"]),
+            Check::Doc => cargo_builtin(&["doc"]),
             Check::Format => cargo_builtin(&["fmt", "--", "--check"]),
             Check::Test => cargo_builtin(&["test"]),
         }
