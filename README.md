@@ -12,14 +12,15 @@ $ cargo install cargo-checkmate
 
 $ cd /path/to/your/crate
 
-$ cargo-checkmate
+$ cargo checkmate
 
-running 5 cargo-checkmate phases
+running 6 cargo-checkmate phases
 cargo-checkmate check... ok.
 cargo-checkmate format... ok.
 cargo-checkmate build... ok.
 cargo-checkmate test... ok.
+cargo-checkmate doc... ok.
 cargo-checkmate audit... ok.
 
-cargo-checkmate result: ok. 5 passed; 0 failed
+cargo-checkmate result: ok. 6 passed; 0 failed
 ```
