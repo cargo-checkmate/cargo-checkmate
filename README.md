@@ -2,7 +2,7 @@
 
 Perform a series of useful checks out of the box. `cargo-checkmate` ensures your project builds, tests pass, has good format, doesn't have dependencies with known vulnerabilities, and so on.
 
-The philosophy is that you can just run it without configuration on most crates to catch as many issues as possible (with low very low false-positives). The rationale behind not having configuration is to know if two different crates pass the same version of `cargo-checkmate` they pass the same checks. Also, this helps ensure bugs are likely shared by most users rather than only present for unusual configurations.
+The philosophy is that you can just run it without configuration on most crates to catch as many issues as possible (with low very low false-positives). The rationale behind not having configuration is that checkmate failures should be the same for all developers (for a given version of `cargo-checkmate`) regardless of individual developer configurations.
 
 ## How to use it:
 
