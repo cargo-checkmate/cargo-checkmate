@@ -61,7 +61,7 @@ If any phase fails, the stdout/stderr logs are displayed automatically:
 $ # Introduce a poorly formatted unit test:
 $ echo '#[test] fn bad_format() {}' >> src/main.rs
 $ cargo checkmate
-emoving prior log directory: ./target/cargo-checkmate/logs
+Removing prior log directory: ./target/cargo-checkmate/logs
 
 running 6 cargo-checkmate phases
 cargo-checkmate check... ok.
