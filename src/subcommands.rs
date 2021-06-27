@@ -9,9 +9,7 @@ pub fn cargo_builtin(args: &[&str]) -> std::io::Result<()> {
 }
 
 pub fn audit() -> std::io::Result<()> {
-    use abscissa_core::application::Application;
-    use cargo_audit::application::{CargoAuditApplication, APPLICATION};
+    use cargo_audit::application::APPLICATION;
 
-    CargoAuditApplication::run(&APPLICATION, vec![String::from("audit")]);
-    Ok(())
+    abscissa_core::boot(&APPLICATION);
 }
