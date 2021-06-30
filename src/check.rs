@@ -1,61 +1,33 @@
-use crate::{invalid_input, IOResult};
+use crate::IOResult;
 use enum_iterator::IntoEnumIterator;
 use std::fmt;
+use structopt::StructOpt;
 
-#[derive(Debug, IntoEnumIterator)]
+#[derive(Debug, IntoEnumIterator, StructOpt)]
 pub enum Check {
+    /// Run all checks.
     Everything,
+
+    /// cargo check: syntax + type checking.
     Check,
+
+    /// Use cargo fmt to check if code is correctly formatted.
     Format,
+
+    /// cargo build: build the default target.
     Build,
+
+    /// cargo test: run automated unit tests.
     Test,
+
+    /// cargo doc: generate docs.
     Doc,
+
+    /// cargo audit: check for security advisories across all dependencies.
     Audit,
 }
 
 impl Check {
-    pub fn parse_args<I>(args: I) -> IOResult<Check>
-    where
-        I: IntoIterator<Item = String>,
-    {
-        fn optstr(x: &Option<String>) -> Option<&str> {
-            x.as_ref().map(String::as_str)
-        }
-
-        let mut it = args.into_iter();
-
-        // The first arg is executable name which we ignore.
-        it.next();
-
-        let mut optcmd = it.next();
-        if optstr(&optcmd) == Some("checkmate") {
-            // If executed by cargo rather than directly, the second argument is
-            // "checkmate", which we ignore:
-            optcmd = it.next();
-        }
-
-        let check = match optstr(&optcmd) {
-            None => Ok(Check::Everything),
-            Some(checkname) => Check::parse(checkname),
-        }?;
-
-        if let Some(junk) = optstr(&it.next()) {
-            invalid_input("Unexpected arg", junk)
-        } else {
-            Ok(check)
-        }
-    }
-
-    fn parse(checkname: &str) -> IOResult<Check> {
-        for check in Check::into_enum_iter() {
-            if format!("{}", check) == checkname {
-                return Ok(check);
-            }
-        }
-
-        invalid_input("Unknown check", checkname)
-    }
-
     pub fn execute(&self) -> IOResult<()> {
         use crate::subcommands::{audit, cargo_builtin};
 
