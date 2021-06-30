@@ -1,9 +1,11 @@
 use crate::IOResult;
 use enum_iterator::IntoEnumIterator;
 use std::fmt;
+use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
 #[derive(Debug, IntoEnumIterator, StructOpt)]
+#[structopt(setting = AppSettings::NoBinaryName)]
 pub enum Check {
     /// Run all checks.
     Everything,
@@ -28,6 +30,21 @@ pub enum Check {
 }
 
 impl Check {
+    pub fn parse_args() -> Check {
+        let mut it = std::env::args().peekable();
+
+        // Skip the binary name:
+        it.next();
+
+        // If executed as `cargo checkmate`, the first arg is "checkmate":
+        if it.peek().map(|s| s.as_str()) == Some("checkmate") {
+            // This will trip up clap parsing, so skip it:
+            it.next();
+        }
+
+        Check::from_iter(it)
+    }
+
     pub fn execute(&self) -> IOResult<()> {
         use crate::subcommands::{audit, cargo_builtin};
 

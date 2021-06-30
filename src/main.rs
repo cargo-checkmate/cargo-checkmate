@@ -13,9 +13,8 @@ const CMDNAME: &'static str = env!("CARGO_PKG_NAME");
 
 fn main() -> IOResult<()> {
     use crate::check::Check;
-    use structopt::StructOpt;
 
     crate::cdcrate::change_directory_to_crate_root()?;
-    let check = Check::from_iter(std::env::args());
+    let check = Check::parse_args();
     check.execute()
 }
