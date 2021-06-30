@@ -10,7 +10,14 @@ use structopt::StructOpt;
 )]
 pub struct Options {
     #[structopt(subcommand)]
-    cmd: Option<Check>,
+    cmd: Option<Subcommand>,
+}
+
+#[derive(Debug, StructOpt)]
+pub enum Subcommand {
+    #[structopt(flatten)]
+    Check(Check),
+    GitHook,
 }
 
 impl Options {
@@ -30,6 +37,17 @@ impl Options {
     }
 
     pub fn execute(&self) -> IOResult<()> {
-        self.cmd.as_ref().unwrap_or(&Check::Everything).execute()
+        let default = Subcommand::Check(Check::Everything);
+        self.cmd.as_ref().unwrap_or(&default).execute()
+    }
+}
+
+impl Subcommand {
+    fn execute(&self) -> IOResult<()> {
+        use Subcommand::*;
+        match self {
+            Check(c) => c.execute(),
+            GitHook => unimplemented!("git-hook"),
+        }
     }
 }
