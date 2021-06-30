@@ -1,3 +1,4 @@
+use crate::executable::Executable;
 use crate::IOResult;
 use enum_iterator::IntoEnumIterator;
 use std::fmt;
@@ -28,20 +29,6 @@ pub enum Check {
 }
 
 impl Check {
-    pub fn execute(&self) -> IOResult<()> {
-        use crate::subcommands::{audit, cargo_builtin};
-
-        match self {
-            Check::Everything => self.execute_everything(),
-            Check::Audit => audit(),
-            Check::Build => cargo_builtin(&["build"]),
-            Check::Check => cargo_builtin(&["check"]),
-            Check::Doc => cargo_builtin(&["doc"]),
-            Check::Format => cargo_builtin(&["fmt", "--", "--check"]),
-            Check::Test => cargo_builtin(&["test"]),
-        }
-    }
-
     fn execute_everything(&self) -> IOResult<()> {
         use crate::runner::Runner;
 
@@ -61,6 +48,22 @@ impl Check {
         }
 
         runner.exit()
+    }
+}
+
+impl Executable for Check {
+    fn execute(&self) -> IOResult<()> {
+        use crate::subcommands::{audit, cargo_builtin};
+
+        match self {
+            Check::Everything => self.execute_everything(),
+            Check::Audit => audit(),
+            Check::Build => cargo_builtin(&["build"]),
+            Check::Check => cargo_builtin(&["check"]),
+            Check::Doc => cargo_builtin(&["doc"]),
+            Check::Format => cargo_builtin(&["fmt", "--", "--check"]),
+            Check::Test => cargo_builtin(&["test"]),
+        }
     }
 }
 

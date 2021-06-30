@@ -1,4 +1,6 @@
 use crate::check::Check;
+use crate::executable::Executable;
+use crate::githook::GitHook;
 use crate::IOResult;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
@@ -17,7 +19,7 @@ pub struct Options {
 pub enum Subcommand {
     #[structopt(flatten)]
     Check(Check),
-    GitHook,
+    GitHook(GitHook),
 }
 
 impl Options {
@@ -35,19 +37,21 @@ impl Options {
 
         Options::from_iter(it)
     }
+}
 
-    pub fn execute(&self) -> IOResult<()> {
+impl Executable for Options {
+    fn execute(&self) -> IOResult<()> {
         let default = Subcommand::Check(Check::Everything);
         self.cmd.as_ref().unwrap_or(&default).execute()
     }
 }
 
-impl Subcommand {
+impl Executable for Subcommand {
     fn execute(&self) -> IOResult<()> {
         use Subcommand::*;
         match self {
-            Check(c) => c.execute(),
-            GitHook => unimplemented!("git-hook"),
+            Check(x) => x.execute(),
+            GitHook(x) => x.execute(),
         }
     }
 }
