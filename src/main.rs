@@ -1,4 +1,5 @@
-#![deny(warnings)]
+#![deny(warnings, trivial_casts, unused_qualifications)]
+#![forbid(unsafe_code)]
 
 mod cdcrate;
 mod check;

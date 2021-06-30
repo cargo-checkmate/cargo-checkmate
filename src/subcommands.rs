@@ -1,6 +1,3 @@
-#![deny(warnings, missing_docs, trivial_casts, unused_qualifications)]
-#![forbid(unsafe_code)]
-
 pub fn cargo_builtin(args: &[&str]) -> std::io::Result<()> {
     use std::process::{exit, Command};
 
