@@ -12,9 +12,9 @@ pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
 const CMDNAME: &'static str = env!("CARGO_PKG_NAME");
 
 fn main() -> IOResult<()> {
-    use crate::check::Check;
+    use crate::check::Options;
 
     crate::cdcrate::change_directory_to_crate_root()?;
-    let check = Check::parse_args();
-    check.execute()
+    let opts = Options::parse_args();
+    opts.execute()
 }

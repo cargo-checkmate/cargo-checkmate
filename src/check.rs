@@ -4,9 +4,18 @@ use std::fmt;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
+#[derive(Debug, StructOpt)]
+#[structopt(
+    setting = AppSettings::NoBinaryName,
+    about = env!("CARGO_PKG_DESCRIPTION"),
+)]
+pub struct Options {
+    #[structopt(subcommand)]
+    cmd: Option<Subcommand>,
+}
+
 #[derive(Debug, IntoEnumIterator, StructOpt)]
-#[structopt(setting = AppSettings::NoBinaryName)]
-pub enum Check {
+pub enum Subcommand {
     /// Run all checks.
     Everything,
 
@@ -29,8 +38,8 @@ pub enum Check {
     Audit,
 }
 
-impl Check {
-    pub fn parse_args() -> Check {
+impl Options {
+    pub fn parse_args() -> Options {
         let mut it = std::env::args().peekable();
 
         // Skip the binary name:
@@ -42,20 +51,30 @@ impl Check {
             it.next();
         }
 
-        Check::from_iter(it)
+        Options::from_iter(it)
     }
 
     pub fn execute(&self) -> IOResult<()> {
+        self.cmd
+            .as_ref()
+            .unwrap_or(&Subcommand::Everything)
+            .execute()
+    }
+}
+
+impl Subcommand {
+    fn execute(&self) -> IOResult<()> {
         use crate::subcommands::{audit, cargo_builtin};
+        use Subcommand::*;
 
         match self {
-            Check::Everything => self.execute_everything(),
-            Check::Audit => audit(),
-            Check::Build => cargo_builtin(&["build"]),
-            Check::Check => cargo_builtin(&["check"]),
-            Check::Doc => cargo_builtin(&["doc"]),
-            Check::Format => cargo_builtin(&["fmt", "--", "--check"]),
-            Check::Test => cargo_builtin(&["test"]),
+            Everything => self.execute_everything(),
+            Audit => audit(),
+            Build => cargo_builtin(&["build"]),
+            Check => cargo_builtin(&["check"]),
+            Doc => cargo_builtin(&["doc"]),
+            Format => cargo_builtin(&["fmt", "--", "--check"]),
+            Test => cargo_builtin(&["test"]),
         }
     }
 
@@ -66,13 +85,13 @@ impl Check {
 
         println!(
             "\nrunning {} {} phases",
-            Check::VARIANT_COUNT - 1,
+            Subcommand::VARIANT_COUNT - 1,
             crate::CMDNAME
         );
 
-        for check in Check::into_enum_iter() {
+        for check in Subcommand::into_enum_iter() {
             match check {
-                Check::Everything => {}
+                Subcommand::Everything => {}
                 _ => runner.run_check(&format!("{}", check))?,
             }
         }
@@ -81,7 +100,7 @@ impl Check {
     }
 }
 
-impl fmt::Display for Check {
+impl fmt::Display for Subcommand {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let dbg = format!("{:?}", self);
         write!(f, "{}", dbg.to_lowercase())
