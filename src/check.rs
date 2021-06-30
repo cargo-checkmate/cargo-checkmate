@@ -6,25 +6,25 @@ use structopt::StructOpt;
 
 #[derive(Debug, IntoEnumIterator, StructOpt)]
 pub enum Check {
-    /// Run all checks.
+    /// [check] Run all checks.
     Everything,
 
-    /// cargo check: syntax + type checking.
+    /// [check] cargo check: syntax + type checking.
     Check,
 
-    /// Use cargo fmt to check if code is correctly formatted.
+    /// [check] Use cargo fmt to check if code is correctly formatted.
     Format,
 
-    /// cargo build: build the default target.
+    /// [check] cargo build: build the default target.
     Build,
 
-    /// cargo test: run automated unit tests.
+    /// [check] cargo test: run automated unit tests.
     Test,
 
-    /// cargo doc: generate docs.
+    /// [check] cargo doc: generate docs.
     Doc,
 
-    /// cargo audit: check for security advisories across all dependencies.
+    /// [check] cargo audit: check for security advisories across all dependencies.
     Audit,
 }
 
