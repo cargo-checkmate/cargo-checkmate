@@ -25,6 +25,65 @@ cargo-checkmate audit... ok.
 cargo-checkmate result: ok. 6 passed; 0 failed
 ```
 
+### git hook
+
+If your crate is in a git repo, you can verify each commit follows `cargo checkmate` checks by running it in a `pre-commit` git hook. You can install a pre-bundled git hook that does precisely that:
+
+```
+$ cargo checkmate git-hook install 
+cargo-checkmate git-hook installed: ".git/hooks/pre-commit"
+```
+
+Now commits are checked:
+```
+$ touch foo 
+$ git add foo
+$ git commit -m 'Demo cargo checkmate git-hook usage.'
+
+cargo checkmate git-hook:
+Removing prior log directory: ./target/cargo-checkmate/logs
+
+running 6 cargo-checkmate phases
+cargo-checkmate check... ok.
+cargo-checkmate format... ok.
+cargo-checkmate build... ok.
+cargo-checkmate test... ok.
+cargo-checkmate doc... ok.
+cargo-checkmate audit... ok.
+
+cargo-checkmate result: ok. 6 passed; 0 failed
+[master 6e3230a] Demo cargo checkmate git-hook usage.
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 src/foo
+```
+
+If you want to intentionally skip the checks for a commit, git provides the `git commit --no-verify` flag. If you change your mind, you can likewise uninstall:
+
+```
+$ cargo checkmate git-hook uninstall
+cargo-checkmate git-hook uninstalled: ".git/hooks/pre-commit"
+```
+
+Both install & install try to be very careful about not clobbering any unrecognized `pre-commit` hook in case you already have a custom one:
+
+```
+$ cargo checkmate git-hook install
+cargo-checkmate git-hook installed: ".git/hooks/pre-commit"
+
+$ cargo checkmate git-hook install
+cargo-checkmate git-hook already installed: ".git/hooks/pre-commit"
+
+$ echo 'blah' > .git/hooks/pre-commit
+
+$ cargo checkmate git-hook uninstall
+cargo-checkmate unrecognized git-hook: ".git/hooks/pre-commit"
+Error: Custom { kind: Other, error: "Unrecongized git-hook: \".git/hooks/pre-commit\"" }
+
+$ cargo checkmate git-hook install
+cargo-checkmate unrecognized git-hook: ".git/hooks/pre-commit"
+Error: Custom { kind: Other, error: "Unrecongized git-hook: \".git/hooks/pre-commit\"" }
+```
+
 ### Logs
 
 Each check phase logs both stdout and stderr into `./target/cargo-checkmate/logs`:
