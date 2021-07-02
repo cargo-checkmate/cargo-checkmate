@@ -1,5 +1,12 @@
 pub use std::io::Result as IOResult;
 
+#[macro_export]
+macro_rules! ioerror {
+    ( $tmpl:expr, $( $arg:expr ),* ) => {
+        std::io::Error::new(std::io::ErrorKind::Other, format!($tmpl, $( $arg ),* ))
+    }
+}
+
 pub fn invalid_input<T, E>(reason: &str, input: E) -> IOResult<T>
 where
     E: std::fmt::Debug,
