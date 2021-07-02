@@ -1,3 +1,3 @@
 #!/bin/sh
-set -x
+echo 'cargo checkmate git-hook:'
 exec cargo checkmate
