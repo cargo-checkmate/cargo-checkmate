@@ -1,4 +1,7 @@
 # cargo-checkmate
+[![CICD](https://github.com/Nereuxofficial/cargo-checkmate/actions/workflows/rust.yml/badge.svg)](https://github.com/Nereuxofficial/cargo-checkmate/actions/workflows/rust.yml)
+![Crates.io](https://img.shields.io/crates/v/cargo-checkmate)
+![Stars](https://img.shields.io/github/stars/nathan-at-least/cargo-checkmate)
 
 Perform a series of useful checks out of the box. `cargo-checkmate` ensures your project builds, tests pass, has good format, doesn't have dependencies with known vulnerabilities, and so on.
 
