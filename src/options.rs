@@ -17,8 +17,12 @@ pub struct Options {
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
+    /// Run all checks.
+    Everything,
+
     #[structopt(flatten)]
     Check(Check),
+
     GitHook(GitHook),
 }
 
@@ -41,17 +45,17 @@ impl Options {
 
 impl Executable for Options {
     fn execute(&self) -> IOResult<()> {
-        let default = Subcommand::Check(Check::Everything);
+        let default = Subcommand::Everything;
         self.cmd.as_ref().unwrap_or(&default).execute()
     }
 }
 
 impl Executable for Subcommand {
     fn execute(&self) -> IOResult<()> {
-        use Subcommand::*;
         match self {
-            Check(x) => x.execute(),
-            GitHook(x) => x.execute(),
+            Subcommand::Everything => Check::execute_everything(),
+            Subcommand::Check(x) => x.execute(),
+            Subcommand::GitHook(x) => x.execute(),
         }
     }
 }

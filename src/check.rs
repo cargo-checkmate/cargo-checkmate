@@ -6,9 +6,6 @@ use structopt::StructOpt;
 
 #[derive(Debug, IntoEnumIterator, StructOpt)]
 pub enum Check {
-    /// Run all checks.
-    Everything,
-
     /// check: `cargo check` syntax + type checking.
     Check,
 
@@ -29,22 +26,19 @@ pub enum Check {
 }
 
 impl Check {
-    fn execute_everything(&self) -> IOResult<()> {
+    pub fn execute_everything() -> IOResult<()> {
         use crate::runner::Runner;
 
         let mut runner = Runner::new()?;
 
         println!(
             "\nrunning {} {} phases",
-            Check::VARIANT_COUNT - 1,
+            Check::VARIANT_COUNT,
             crate::CMDNAME
         );
 
         for check in Check::into_enum_iter() {
-            match check {
-                Check::Everything => {}
-                _ => runner.run_check(&format!("{}", check))?,
-            }
+            runner.run_check(&format!("{}", check))?;
         }
 
         runner.exit()
@@ -56,7 +50,6 @@ impl Executable for Check {
         use crate::subcommands::{audit, cargo_builtin};
 
         match self {
-            Check::Everything => self.execute_everything(),
             Check::Audit => audit(),
             Check::Build => cargo_builtin(&["build"]),
             Check::Check => cargo_builtin(&["check"]),
