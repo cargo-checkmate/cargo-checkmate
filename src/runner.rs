@@ -58,7 +58,11 @@ impl Runner {
         }
 
         let results = if output.status.success() {
-            println!("ok.");
+            if output.stdout.starts_with(b"skipped:\n") {
+                println!("skipped.");
+            } else {
+                println!("ok.");
+            }
             &mut self.passes
         } else {
             println!("FAILED.");

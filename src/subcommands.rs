@@ -63,7 +63,7 @@ fn audit_if_necessary() -> std::io::Result<()> {
         std::process::exit(status.code().unwrap());
     } else {
         // stamp is recent and newer than lockfile:
-        println!("Skipped due to recent timestamp: {:?}", stamp);
+        println!("skipped:\nFound recent timestamp: {:?}", stamp);
         Ok(())
     }
 }
