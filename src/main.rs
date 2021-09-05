@@ -7,10 +7,12 @@ mod executable;
 mod githook;
 mod iohelpers;
 mod options;
+mod resultsdir;
 mod runner;
 mod subcommands;
 
 pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
+pub use resultsdir::results_dir;
 
 const CMDNAME: &'static str = env!("CARGO_PKG_NAME");
 

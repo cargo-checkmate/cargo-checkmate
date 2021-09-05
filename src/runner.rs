@@ -7,25 +7,25 @@ mod phaseresult;
 use phaseresult::PhaseResult;
 
 pub struct Runner {
-    rellogdir: PathBuf,
+    logdir: PathBuf,
     passes: Vec<PhaseResult>,
     fails: Vec<PhaseResult>,
 }
 
 impl Runner {
     pub fn new() -> Result<Runner> {
-        let rellogdir: PathBuf = [".", "target", CMDNAME, "logs"].iter().collect();
+        let logdir = crate::results_dir().join("logs");
 
         {
-            if rellogdir.exists() {
-                println!("Removing prior log directory: {}", &rellogdir.display());
-                std::fs::remove_dir_all(&rellogdir)?;
+            if logdir.exists() {
+                println!("Removing prior log directory: {}", &logdir.display());
+                std::fs::remove_dir_all(&logdir)?;
             }
-            std::fs::create_dir_all(&rellogdir)?;
+            std::fs::create_dir_all(&logdir)?;
         }
 
         Ok(Runner {
-            rellogdir: rellogdir,
+            logdir: logdir,
             passes: vec![],
             fails: vec![],
         })
@@ -95,6 +95,6 @@ impl Runner {
     }
 
     fn rellog_path(&self, checkname: &str, outkind: &str) -> PathBuf {
-        self.rellogdir.join(&format!("{}.{}", checkname, outkind))
+        self.logdir.join(&format!("{}.{}", checkname, outkind))
     }
 }

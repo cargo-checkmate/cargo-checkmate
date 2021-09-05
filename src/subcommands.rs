@@ -28,10 +28,16 @@ fn force_audit() -> std::io::Result<()> {
 }
 
 fn audit_if_necessary() -> std::io::Result<()> {
-    use std::path::PathBuf;
     use std::process::Command;
 
-    let stamp = PathBuf::from("target/audit.timestamp");
+    let stamp = crate::results_dir().join("audit.timestamp");
+    {
+        let stampdir = stamp.parent().unwrap();
+        if !stampdir.is_dir() {
+            std::fs::create_dir_all(&stampdir)?;
+        }
+    }
+
     let stamptime = modified(&stamp)?;
 
     let stampage = stamptime.elapsed().map_err(|e| {
