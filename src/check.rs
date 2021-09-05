@@ -48,7 +48,7 @@ impl Check {
         println!("\nrunning {} {} phases", everything.len(), crate::CMDNAME);
 
         for check in everything {
-            runner.run_check(&format!("{}", check))?;
+            runner.run_check(check)?;
         }
 
         runner.exit()
@@ -72,7 +72,13 @@ impl Executable for Check {
 
 impl fmt::Display for Check {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let dbg = format!("{:?}", self);
-        write!(f, "{}", dbg.to_lowercase())
+        write!(
+            f,
+            "{}",
+            match self {
+                Check::Audit(opts) => format!("audit{}", if opts.force { " (force)" } else { "" }),
+                _ => format!("{:?}", self).to_lowercase(),
+            }
+        )
     }
 }

@@ -1,3 +1,4 @@
+use crate::check::Check;
 use crate::CMDNAME;
 use std::io::Result;
 use std::path::PathBuf;
@@ -30,9 +31,10 @@ impl Runner {
         })
     }
 
-    pub fn run_check(&mut self, checkname: &str) -> Result<()> {
+    pub fn run_check(&mut self, check: &Check) -> Result<()> {
         use std::process::Command;
 
+        let checkname = &check.to_string();
         let exec = std::env::current_exe()?;
 
         print!("{} {}... ", CMDNAME, checkname);
