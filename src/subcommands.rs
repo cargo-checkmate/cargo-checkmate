@@ -5,8 +5,12 @@ pub fn cargo_builtin(args: &[&str]) -> std::io::Result<()> {
     exit(status.code().unwrap_or(-1));
 }
 
-pub fn audit() -> std::io::Result<()> {
+pub fn audit(force: bool) -> std::io::Result<()> {
+    todo!("Implement audit with force option: {:?}", force);
+
+    /*
     use cargo_audit::application::APPLICATION;
 
     abscissa_core::boot(&APPLICATION);
+    */
 }
