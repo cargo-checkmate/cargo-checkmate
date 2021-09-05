@@ -47,7 +47,7 @@ fn audit_if_necessary() -> std::io::Result<()> {
 
     if expired || stale {
         let exe = std::env::current_exe()?;
-        let status = dbg!(Command::new(exe).arg("audit").arg("--force")).status()?;
+        let status = Command::new(exe).arg("audit").arg("--force").status()?;
 
         if status.success() {
             // Touch the timestamp path:
