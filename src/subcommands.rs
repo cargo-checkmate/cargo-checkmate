@@ -55,7 +55,7 @@ fn audit_if_necessary() -> std::io::Result<()> {
         let exe = std::env::current_exe()?;
         let status = Command::new(exe).arg("audit").arg("--force").status()?;
 
-        if status.success() {
+        if stale && status.success() {
             // Touch the timestamp path:
             std::fs::File::create(stamp)?;
         }
