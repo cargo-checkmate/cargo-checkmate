@@ -30,13 +30,13 @@ cargo-checkmate result: ok. 6 passed; 0 failed
 If your crate is in a git repo, you can verify each commit follows `cargo checkmate` checks by running it in a `pre-commit` git hook. You can install a pre-bundled git hook that does precisely that:
 
 ```
-$ cargo checkmate git-hook install 
+$ cargo checkmate git-hook install
 cargo-checkmate git-hook installed: ".git/hooks/pre-commit"
 ```
 
 Now commits are checked:
 ```
-$ touch foo 
+$ touch foo
 $ git add foo
 $ git commit -m 'Demo cargo checkmate git-hook usage.'
 
@@ -89,7 +89,7 @@ Error: Custom { kind: Other, error: "Unrecongized git-hook: \".git/hooks/pre-com
 Each check phase logs both stdout and stderr into `./target/cargo-checkmate/logs`:
 
 ```
-$ cat ./target/cargo-checkmate/logs/doc.stderr 
+$ cat ./target/cargo-checkmate/logs/doc.stderr
  Documenting cargo-checkmate v0.1.2 (/home/user/hack/cargo-checkmate)
     Finished dev [unoptimized + debuginfo] target(s) in 1.67s
 ```
@@ -141,7 +141,7 @@ failures:
 | -#[test] fn bad_format() {}
 | +#[test]
 | +fn bad_format() {}
-|  
+|
 
 cargo-checkmate result: FAILED. 5 passed; 1 failed
 ```
