@@ -146,3 +146,11 @@ failures:
 cargo-checkmate result: FAILED. 5 passed; 1 failed
 ```
 
+### Audit Freshness
+
+The `cargo audit` command always fetches an advisory db which requires network access and latency. As an optimization, `cargo-checkmate` skips `cargo audit` if the following conditions are true:
+
+- `Cargo.lock` has not been modified, and
+- The timestamp of the last successful run of `cargo audit` is less than three hours old.
+
+This optimizes the use of `cargo-checkmate` especially for the git hook assuming a developer is committing many revisions over a couple of hours.
