@@ -16,8 +16,6 @@ jobs:
       - name: cargo-checkmate
         run: |
           echo '::echo::on'
-          # hack to skip audit for now:
           mkdir -p target/cargo-checkmate
           touch target/cargo-checkmate/audit.timestamp
-          # do the actual checks aside from audit:
           cargo run
