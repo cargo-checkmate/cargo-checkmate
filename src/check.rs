@@ -20,6 +20,9 @@ pub enum Check {
     /// check: `cargo doc` generation.
     Doc,
 
+    /// check: `cargo clippy` lint checks.
+    Clippy,
+
     /// check: `cargo audit` security advisories across all dependencies.
     Audit(AuditOptions),
 }
@@ -37,6 +40,7 @@ impl Check {
         let everything = &[
             Check::Check,
             Check::Format,
+            Check::Clippy,
             Check::Build,
             Check::Test,
             Check::Doc,
@@ -64,6 +68,7 @@ impl Executable for Check {
             Check::Build => cargo_builtin(&["build"]),
             Check::Check => cargo_builtin(&["check"]),
             Check::Doc => cargo_builtin(&["doc"]),
+            Check::Clippy => cargo_builtin(&["clippy"]),
             Check::Format => cargo_builtin(&["fmt", "--", "--check"]),
             Check::Test => cargo_builtin(&["test"]),
         }
