@@ -1,6 +1,6 @@
-use crate::check::Check;
 use crate::executable::Executable;
 use crate::githook::GitHook;
+use crate::phase::Phase;
 use crate::IOResult;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
@@ -17,11 +17,11 @@ pub struct Options {
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
-    /// Run all checks.
+    /// Run all phases.
     Everything,
 
     #[structopt(flatten)]
-    Check(Check),
+    Phase(Phase),
 
     GitHook(GitHook),
 }
@@ -53,8 +53,8 @@ impl Executable for Options {
 impl Executable for Subcommand {
     fn execute(&self) -> IOResult<()> {
         match self {
-            Subcommand::Everything => Check::execute_everything(),
-            Subcommand::Check(x) => x.execute(),
+            Subcommand::Everything => Phase::execute_everything(),
+            Subcommand::Phase(x) => x.execute(),
             Subcommand::GitHook(x) => x.execute(),
         }
     }

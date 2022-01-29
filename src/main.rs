@@ -2,11 +2,11 @@
 #![forbid(unsafe_code)]
 
 mod cdcrate;
-mod check;
 mod executable;
 mod githook;
 mod iohelpers;
 mod options;
+mod phase;
 mod resultsdir;
 mod runner;
 mod subcommands;

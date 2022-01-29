@@ -1,4 +1,4 @@
-use crate::check::Check;
+use crate::phase::Phase;
 use crate::CMDNAME;
 use std::io::Result;
 use std::path::PathBuf;
@@ -31,23 +31,23 @@ impl Runner {
         })
     }
 
-    pub fn run_check(&mut self, check: &Check) -> Result<()> {
+    pub fn run_phase(&mut self, phase: &Phase) -> Result<()> {
         use std::process::Command;
 
-        let checkname = &check.to_string();
+        let phasename = &phase.to_string();
         let exec = std::env::current_exe()?;
 
-        print!("{} {}... ", CMDNAME, checkname);
+        print!("{} {}... ", CMDNAME, phasename);
 
         {
             use std::io::Write;
             std::io::stdout().flush()?;
         }
 
-        let output = Command::new(exec).arg(checkname).output()?;
+        let output = Command::new(exec).arg(phasename).output()?;
 
-        let reloutlog = self.rellog_path(checkname, "stdout");
-        let relerrlog = self.rellog_path(checkname, "stderr");
+        let reloutlog = self.rellog_path(phasename, "stdout");
+        let relerrlog = self.rellog_path(phasename, "stderr");
 
         {
             use std::fs::File;
@@ -69,7 +69,7 @@ impl Runner {
             &mut self.fails
         };
 
-        results.push(PhaseResult::new(checkname, reloutlog, relerrlog));
+        results.push(PhaseResult::new(phasename, reloutlog, relerrlog));
 
         Ok(())
     }
@@ -98,7 +98,7 @@ impl Runner {
         std::process::exit(exitstatus);
     }
 
-    fn rellog_path(&self, checkname: &str, outkind: &str) -> PathBuf {
-        self.logdir.join(&format!("{}.{}", checkname, outkind))
+    fn rellog_path(&self, phasename: &str, outkind: &str) -> PathBuf {
+        self.logdir.join(&format!("{}.{}", phasename, outkind))
     }
 }
