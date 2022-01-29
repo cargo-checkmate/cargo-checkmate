@@ -15,6 +15,7 @@ jobs:
           override: true
       - name: cargo-checkmate
         run: |
+          echo '::echo::on'
           # hack to skip audit for now:
           mkdir -p target/cargo-checkmate
           touch target/cargo-checkmate/audit.timestamp
