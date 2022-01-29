@@ -25,7 +25,7 @@ impl Runner {
         }
 
         Ok(Runner {
-            logdir: logdir,
+            logdir,
             passes: vec![],
             fails: vec![],
         })

@@ -7,10 +7,7 @@ pub struct Indenter<W> {
 
 impl<W> From<W> for Indenter<W> {
     fn from(f: W) -> Indenter<W> {
-        Indenter {
-            f: f,
-            linestart: true,
-        }
+        Indenter { f, linestart: true }
     }
 }
 
@@ -44,7 +41,7 @@ impl<W: Write> Indenter<W> {
     }
 
     fn write_trailing_chunk(&mut self, chunk: &[u8]) -> Result<usize> {
-        if chunk.len() > 0 {
+        if !chunk.is_empty() {
             self._write_chunk(chunk, false)
         } else {
             Ok(0)

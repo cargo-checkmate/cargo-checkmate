@@ -14,7 +14,7 @@ mod subcommands;
 pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
 pub use resultsdir::results_dir;
 
-const CMDNAME: &'static str = env!("CARGO_PKG_NAME");
+const CMDNAME: &str = env!("CARGO_PKG_NAME");
 
 fn main() -> IOResult<()> {
     use crate::executable::Executable;

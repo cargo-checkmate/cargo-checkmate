@@ -1,6 +1,6 @@
 use crate::executable::Executable;
 use crate::IOResult;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 /// git-hook support.
@@ -100,19 +100,18 @@ fn git_dir() -> IOResult<PathBuf> {
     // Echo any stderr output:
     std::io::stderr().write_all(errbytes)?;
 
-    if gitout.status.success() && errbytes.len() == 0 {
+    if gitout.status.success() && errbytes.is_empty() {
         let s = std::str::from_utf8(outbytes)
             .map_err(|e| ioerror!("{:?} git-dir not utf8; bytes: {:?}", e, outbytes))?;
-        let stripped = s.strip_suffix('\n').ok_or(ioerror!(
-            "git-dir missing expected terminal newline: {:?}",
-            s
-        ))?;
+        let stripped = s
+            .strip_suffix('\n')
+            .ok_or_else(|| ioerror!("git-dir missing expected terminal newline: {:?}", s))?;
         Ok(PathBuf::from(stripped))
     } else {
         Err(ioerror!(
             "git rev-parse --git-dir exit {:?}{}",
             gitout.status,
-            if errbytes.len() == 0 {
+            if errbytes.is_empty() {
                 ""
             } else {
                 " with stderr noise."
@@ -126,17 +125,17 @@ fn make_executable(f: std::fs::File) -> IOResult<()> {
 
     let mut perms = f.metadata()?.permissions();
     // Set user read/write perms on unix:
-    perms.set_mode(perms.mode() | 0500);
+    perms.set_mode(perms.mode() | 0o500);
     f.set_permissions(perms)?;
     Ok(())
 }
 
-fn hook_contents_recognized(hookpath: &PathBuf) -> IOResult<bool> {
+fn hook_contents_recognized(hookpath: &Path) -> IOResult<bool> {
     let contents = std::fs::read(&hookpath)?;
     Ok(contents == HOOK_BODY)
 }
 
-fn unrecognized_hook_contents(hookpath: &PathBuf) -> IOResult<()> {
+fn unrecognized_hook_contents(hookpath: &Path) -> IOResult<()> {
     use crate::{ioerror, CMDNAME};
 
     println!("{} unrecognized git-hook: {:?}", CMDNAME, &hookpath);
