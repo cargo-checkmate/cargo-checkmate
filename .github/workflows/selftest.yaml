@@ -1,0 +1,21 @@
+on: [push, pull_request]
+
+name: Continuous integration
+
+jobs:
+  selftest:
+    name: self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: cargo-checkmate
+        run: |
+          echo '::echo::on'
+          mkdir -p target/cargo-checkmate
+          touch target/cargo-checkmate/audit.timestamp
+          cargo run
