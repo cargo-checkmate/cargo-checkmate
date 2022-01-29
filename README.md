@@ -2,7 +2,7 @@
 
 Perform a series of useful checks out of the box. `cargo-checkmate` ensures your project builds, tests pass, has good format, doesn't have dependencies with known vulnerabilities, and so on.
 
-The philosophy is that you can just run it without configuration on most crates to catch as many issues as possible (with low very low false-positives). The rationale behind not having configuration is that checkmate failures should be the same for all developers (for a given version of `cargo-checkmate`) regardless of individual developer configurations.
+The philosophy is that you can just run it without configuration on most crates to catch as many issues as possible (with low false-positives). The rationale behind not having configuration is that checkmate failures should be the same for all developers (for a given version of `cargo-checkmate`) regardless of individual developer configurations.
 
 ## How to use it
 
@@ -64,7 +64,7 @@ $ cargo checkmate git-hook uninstall
 cargo-checkmate git-hook uninstalled: ".git/hooks/pre-commit"
 ```
 
-Both install & install try to be very careful about not clobbering any unrecognized `pre-commit` hook in case you already have a custom one:
+Both install & uninstall try to be very careful about not clobbering any unrecognized `pre-commit` hook in case you already have a custom one:
 
 ```
 $ cargo checkmate git-hook install
