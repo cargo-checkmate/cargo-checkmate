@@ -10,6 +10,7 @@ mod options;
 mod phase;
 mod resultsdir;
 mod runner;
+mod srcbundle;
 mod subcommands;
 
 pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};

@@ -26,34 +26,26 @@ impl Executable for GitHook {
 const HOOK_BODY: &[u8] = include_bytes!("githook-pre-commit.sh");
 
 fn install() -> IOResult<()> {
+    use crate::srcbundle::{open_if_non_existent, FileOrAlreadyExists::*};
     use crate::CMDNAME;
     use std::io::Write;
 
     let hookpath = hook_path()?;
-
-    let openres = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&hookpath);
-
-    match openres {
-        Ok(mut f) => {
+    match open_if_non_existent(&hookpath)? {
+        File(mut f) => {
             f.write_all(HOOK_BODY)?;
             make_executable(f)?;
             println!("{} git-hook installed: {:?}", CMDNAME, &hookpath);
             Ok(())
         }
-        Err(e) => match e.kind() {
-            std::io::ErrorKind::AlreadyExists => {
-                if hook_contents_recognized(&hookpath)? {
-                    println!("{} git-hook already installed: {:?}", CMDNAME, &hookpath);
-                    Ok(())
-                } else {
-                    unrecognized_hook_contents(&hookpath)
-                }
+        AlreadyExists => {
+            if hook_contents_recognized(&hookpath)? {
+                println!("{} git-hook already installed: {:?}", CMDNAME, &hookpath);
+                Ok(())
+            } else {
+                unrecognized_hook_contents(&hookpath)
             }
-            _ => Err(e),
-        },
+        }
     }
 }
 
