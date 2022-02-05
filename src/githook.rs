@@ -14,15 +14,19 @@ pub enum GitHook {
 
 impl Executable for GitHook {
     fn execute(&self) -> IOResult<()> {
-        use crate::srcbundle::{install, uninstall};
+        use crate::srcbundle::SourceBundle;
         use GitHook::*;
 
-        const HOOK_BODY: &[u8] = include_bytes!("githook-pre-commit.sh");
-        let dest = hook_path()?;
+        let sb = SourceBundle {
+            name: "git-hook",
+            dest: hook_path()?,
+            contents: include_bytes!("githook-pre-commit.sh"),
+            executable: true,
+        };
 
         match self {
-            Install => install("git-hook", &dest, HOOK_BODY, true),
-            Uninstall => uninstall("git-hook", &dest, HOOK_BODY),
+            Install => sb.install(),
+            Uninstall => sb.uninstall(),
         }
     }
 }

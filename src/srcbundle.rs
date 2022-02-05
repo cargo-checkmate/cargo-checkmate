@@ -1,40 +1,53 @@
 use crate::IOResult;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-pub fn install(name: &str, dest: &Path, contents: &[u8], executable: bool) -> IOResult<()> {
-    use crate::CMDNAME;
-    use FileOrAlreadyExists::*;
+#[derive(Debug)]
+pub struct SourceBundle {
+    pub name: &'static str,
+    pub dest: PathBuf,
+    pub contents: &'static [u8],
+    pub executable: bool,
+}
 
-    match open_if_non_existent(dest)? {
-        File(mut f) => {
-            use std::io::Write;
+impl SourceBundle {
+    pub fn install(&self) -> IOResult<()> {
+        use crate::CMDNAME;
+        use FileOrAlreadyExists::*;
 
-            f.write_all(contents)?;
-            if executable {
-                make_executable(f)?;
-            }
-            println!("{} {} installed: {:?}", CMDNAME, name, dest);
-            Ok(())
-        }
-        AlreadyExists => {
-            if contents_recognized(dest, contents)? {
-                println!("{} {} already installed: {:?}", CMDNAME, name, dest);
+        match open_if_non_existent(&self.dest)? {
+            File(mut f) => {
+                use std::io::Write;
+
+                f.write_all(self.contents)?;
+                if self.executable {
+                    make_executable(f)?;
+                }
+                println!("{} {} installed: {:?}", CMDNAME, self.name, &self.dest);
                 Ok(())
-            } else {
-                unrecognized_contents(name, dest)
+            }
+            AlreadyExists => {
+                if contents_recognized(&self.dest, self.contents)? {
+                    println!(
+                        "{} {} already installed: {:?}",
+                        CMDNAME, self.name, &self.dest
+                    );
+                    Ok(())
+                } else {
+                    unrecognized_contents(self.name, &self.dest)
+                }
             }
         }
     }
-}
 
-pub fn uninstall(name: &str, dest: &Path, contents: &[u8]) -> IOResult<()> {
-    if contents_recognized(dest, contents)? {
-        use crate::CMDNAME;
-        std::fs::remove_file(dest)?;
-        println!("{} {} uninstalled: {:?}", CMDNAME, name, dest);
-        Ok(())
-    } else {
-        unrecognized_contents(name, dest)
+    pub fn uninstall(&self) -> IOResult<()> {
+        if contents_recognized(&self.dest, self.contents)? {
+            use crate::CMDNAME;
+            std::fs::remove_file(&self.dest)?;
+            println!("{} {} uninstalled: {:?}", CMDNAME, self.name, &self.dest);
+            Ok(())
+        } else {
+            unrecognized_contents(self.name, &self.dest)
+        }
     }
 }
 
