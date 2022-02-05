@@ -23,12 +23,7 @@ impl Executable for GitHook {
     }
 }
 
-macro_rules! hookname {
-    () => {
-        "pre-commit"
-    };
-}
-const HOOK_BODY: &[u8] = include_bytes!(concat!("githook-", hookname!(), ".sh"));
+const HOOK_BODY: &[u8] = include_bytes!("githook-pre-commit.sh");
 
 fn install() -> IOResult<()> {
     use crate::CMDNAME;
@@ -78,46 +73,12 @@ fn uninstall() -> IOResult<()> {
 }
 
 fn hook_path() -> IOResult<PathBuf> {
-    let mut pb = git_dir()?;
-    pb.push("hooks");
-    pb.push(hookname!());
-    Ok(pb)
+    Ok(git_dir()?.join("hooks").join("pre-commit"))
 }
 
 fn git_dir() -> IOResult<PathBuf> {
-    use crate::ioerror;
-    use std::io::Write;
-    use std::process::Command;
-
-    let gitout = Command::new("git")
-        .arg("rev-parse")
-        .arg("--git-dir")
-        .output()?;
-
-    let outbytes = &gitout.stdout[..];
-    let errbytes = &gitout.stderr[..];
-
-    // Echo any stderr output:
-    std::io::stderr().write_all(errbytes)?;
-
-    if gitout.status.success() && errbytes.is_empty() {
-        let s = std::str::from_utf8(outbytes)
-            .map_err(|e| ioerror!("{:?} git-dir not utf8; bytes: {:?}", e, outbytes))?;
-        let stripped = s
-            .strip_suffix('\n')
-            .ok_or_else(|| ioerror!("git-dir missing expected terminal newline: {:?}", s))?;
-        Ok(PathBuf::from(stripped))
-    } else {
-        Err(ioerror!(
-            "git rev-parse --git-dir exit {:?}{}",
-            gitout.status,
-            if errbytes.is_empty() {
-                ""
-            } else {
-                " with stderr noise."
-            }
-        ))
-    }
+    let s = crate::git::run(&["rev-parse", "--git-dir"])?;
+    Ok(PathBuf::from(s.trim_end()))
 }
 
 fn make_executable(f: std::fs::File) -> IOResult<()> {
