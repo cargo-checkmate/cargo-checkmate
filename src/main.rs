@@ -5,6 +5,7 @@ mod cdcrate;
 mod executable;
 mod git;
 mod githook;
+mod githubci;
 mod iohelpers;
 mod options;
 mod phase;
