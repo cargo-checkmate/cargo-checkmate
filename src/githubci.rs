@@ -3,7 +3,7 @@ use crate::IOResult;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-/// git-hook support.
+/// GitHub CI support.
 #[derive(Debug, StructOpt)]
 pub enum GithubCI {
     /// install github CI.
