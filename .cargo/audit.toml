@@ -1,0 +1,14 @@
+[advisories]
+ignore = [
+    # `time` localtime_r segfault
+    # This is ignored without a clear understanding of the impact on `cargo-checkmate`!
+    "RUSTSEC-2020-0071",
+
+    # `chrono` localtime_r segfault
+    # This is ignored without a clear understanding of the impact on `cargo-checkmate`!
+    "RUSTSEC-2020-0159",
+]
+
+[output]
+quiet = false
+deny = ["warnings"]
