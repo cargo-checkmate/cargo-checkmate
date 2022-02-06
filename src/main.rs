@@ -3,12 +3,15 @@
 
 mod cdcrate;
 mod executable;
+mod git;
 mod githook;
+mod githubci;
 mod iohelpers;
 mod options;
 mod phase;
 mod resultsdir;
 mod runner;
+mod srcbundle;
 mod subcommands;
 
 pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
