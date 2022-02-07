@@ -18,15 +18,16 @@ $ cd /path/to/your/crate
 
 $ cargo checkmate
 
-running 6 cargo-checkmate phases
+running 7 cargo-checkmate phases
 cargo-checkmate check... ok.
 cargo-checkmate format... ok.
+cargo-checkmate clippy... ok.
 cargo-checkmate build... ok.
 cargo-checkmate test... ok.
 cargo-checkmate doc... ok.
 cargo-checkmate audit... ok.
 
-cargo-checkmate result: ok. 6 passed; 0 failed
+cargo-checkmate result: ok. 7 passed; 0 failed
 ```
 
 ### git hook
