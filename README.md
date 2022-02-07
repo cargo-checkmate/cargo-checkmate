@@ -89,6 +89,19 @@ cargo-checkmate unrecognized git-hook: ".git/hooks/pre-commit"
 Error: Custom { kind: Other, error: "Unrecongized git-hook: \".git/hooks/pre-commit\"" }
 ```
 
+### GitHub CI
+
+If you use GitHub, you can install a GitHub Action which runs `cargo-checkmate` on each `push` and `pull_request` event:
+
+```
+$ cargo checkmate github-ci install
+cargo-checkmate GitHub CI installed: "/path/to/your/crate/.github/workflows/cargo-checkmate.yaml"
+```
+
+You must commit this to your repository separately from this command.
+
+The install/uninstall behavior is the same logic as for the `git-hook` subcommand, with care not to delete or overwrite unexpected file contents.
+
 ### Logs
 
 Each check phase logs both stdout and stderr into `./target/cargo-checkmate/logs`:
