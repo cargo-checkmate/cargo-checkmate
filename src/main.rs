@@ -9,6 +9,7 @@ mod githubci;
 mod iohelpers;
 mod options;
 mod phase;
+mod readme;
 mod resultsdir;
 mod runner;
 mod srcbundle;
