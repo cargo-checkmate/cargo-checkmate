@@ -14,6 +14,7 @@ impl SourceBundle {
         use crate::CMDNAME;
         use FileOrAlreadyExists::*;
 
+        std::fs::create_dir_all(self.dest.parent().unwrap())?;
         match open_if_non_existent(&self.dest)? {
             File(mut f) => {
                 use std::io::Write;
