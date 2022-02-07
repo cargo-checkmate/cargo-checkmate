@@ -2,6 +2,7 @@ use crate::executable::Executable;
 use crate::githook::GitHook;
 use crate::githubci::GithubCI;
 use crate::phase::Phase;
+use crate::readme::Readme;
 use crate::IOResult;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
@@ -26,6 +27,7 @@ pub enum Subcommand {
 
     GitHook(GitHook),
     GithubCI(GithubCI),
+    Readme(Readme),
 }
 
 impl Options {
@@ -59,6 +61,7 @@ impl Executable for Subcommand {
             Subcommand::Phase(x) => x.execute(),
             Subcommand::GitHook(x) => x.execute(),
             Subcommand::GithubCI(x) => x.execute(),
+            Subcommand::Readme(x) => x.execute(),
         }
     }
 }
