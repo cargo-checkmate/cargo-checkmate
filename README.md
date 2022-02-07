@@ -18,15 +18,16 @@ $ cd /path/to/your/crate
 
 $ cargo checkmate
 
-running 6 cargo-checkmate phases
+running 7 cargo-checkmate phases
 cargo-checkmate check... ok.
 cargo-checkmate format... ok.
+cargo-checkmate clippy... ok.
 cargo-checkmate build... ok.
 cargo-checkmate test... ok.
 cargo-checkmate doc... ok.
 cargo-checkmate audit... ok.
 
-cargo-checkmate result: ok. 6 passed; 0 failed
+cargo-checkmate result: ok. 7 passed; 0 failed
 ```
 
 ### git hook
@@ -87,6 +88,19 @@ $ cargo checkmate git-hook install
 cargo-checkmate unrecognized git-hook: ".git/hooks/pre-commit"
 Error: Custom { kind: Other, error: "Unrecongized git-hook: \".git/hooks/pre-commit\"" }
 ```
+
+### GitHub CI
+
+If you use GitHub, you can install a GitHub Action which runs `cargo-checkmate` on each `push` and `pull_request` event:
+
+```
+$ cargo checkmate github-ci install
+cargo-checkmate GitHub CI installed: "/path/to/your/crate/.github/workflows/cargo-checkmate.yaml"
+```
+
+You must commit this to your repository separately from this command.
+
+The install/uninstall behavior is the same logic as for the `git-hook` subcommand, with care not to delete or overwrite unexpected file contents.
 
 ### Logs
 
@@ -150,7 +164,9 @@ failures:
 cargo-checkmate result: FAILED. 5 passed; 1 failed
 ```
 
-### Audit Freshness
+### Audits
+
+#### Audit Freshness
 
 The `cargo audit` command always fetches an advisory db which requires network access and latency. As an optimization, `cargo-checkmate` skips `cargo audit` if the following conditions are true:
 
@@ -158,3 +174,24 @@ The `cargo audit` command always fetches an advisory db which requires network a
 - The timestamp of the last successful run of `cargo audit` is less than three hours old.
 
 This optimizes the use of `cargo-checkmate` especially for the git hook assuming a developer is committing many revisions over a couple of hours.
+
+#### Ignoring vulnerability disclosures
+
+Sometimes your crate's transitive dependencies have vulnerability disclosures that you are aware of, which cannot be resolved with a simple `cargo update`, and which have a minimal impact on your crate's users. In that case, you can instruct `cargo audit` to ignore them, so that they won't block successful completion of `cargo checkmate` in your continuous integration flow.
+
+To do so, configure `cargo audit` for your project to ignore the specific issues. It is good practice to explain in a comment why they are being ignored.
+
+The configuration file is in `.cargo/audit.toml` in your crate's project directory. Currently `cargo checkmate` itself ignores two errors:
+
+```toml
+[advisories]
+ignore = [
+    # `time` localtime_r segfault
+    # This is ignored without a clear understanding of the impact on `cargo-checkmate`!
+    "RUSTSEC-2020-0071",
+
+    # `chrono` localtime_r segfault
+    # This is ignored without a clear understanding of the impact on `cargo-checkmate`!
+    "RUSTSEC-2020-0159",
+]
+```
