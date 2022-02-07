@@ -164,7 +164,9 @@ failures:
 cargo-checkmate result: FAILED. 5 passed; 1 failed
 ```
 
-### Audit Freshness
+### Audits
+
+#### Audit Freshness
 
 The `cargo audit` command always fetches an advisory db which requires network access and latency. As an optimization, `cargo-checkmate` skips `cargo audit` if the following conditions are true:
 
@@ -172,3 +174,24 @@ The `cargo audit` command always fetches an advisory db which requires network a
 - The timestamp of the last successful run of `cargo audit` is less than three hours old.
 
 This optimizes the use of `cargo-checkmate` especially for the git hook assuming a developer is committing many revisions over a couple of hours.
+
+#### Ignoring vulnerability disclosures
+
+Sometimes your crate's transitive dependencies have vulnerability disclosures that you are aware of, which cannot be resolved with a simple `cargo update`, and which have a minimal impact on your crate's users. In that case, you can instruct `cargo audit` to ignore them, so that they won't block successful completion of `cargo checkmate` in your continuous integration flow.
+
+To do so, configure `cargo audit` for your project to ignore the specific issues. It is good practice to explain in a comment why they are being ignored.
+
+The configuration file is in `.cargo/audit.toml` in your crate's project directory. Currently `cargo checkmate` itself ignores two errors:
+
+```toml
+[advisories]
+ignore = [
+    # `time` localtime_r segfault
+    # This is ignored without a clear understanding of the impact on `cargo-checkmate`!
+    "RUSTSEC-2020-0071",
+
+    # `chrono` localtime_r segfault
+    # This is ignored without a clear understanding of the impact on `cargo-checkmate`!
+    "RUSTSEC-2020-0159",
+]
+```
