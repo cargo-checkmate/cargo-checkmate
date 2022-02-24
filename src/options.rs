@@ -43,7 +43,11 @@ impl Options {
             it.next();
         }
 
-        Options::from_iter(it)
+        Self::from_clap(
+            &Self::clap()
+                .bin_name("cargo-checkmate")
+                .get_matches_from(it),
+        )
     }
 }
 
