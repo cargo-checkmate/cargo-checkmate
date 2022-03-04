@@ -10,12 +10,12 @@ pub struct SourceBundle {
 }
 
 impl SourceBundle {
-    pub fn install(&self) -> IOResult<()> {
+    pub fn install(&self, force: bool) -> IOResult<()> {
         use crate::CMDNAME;
         use FileOrAlreadyExists::*;
 
         std::fs::create_dir_all(self.dest.parent().unwrap())?;
-        match open_if_non_existent(&self.dest)? {
+        match open_file(&self.dest, force)? {
             File(mut f) => {
                 use std::io::Write;
 
@@ -40,8 +40,8 @@ impl SourceBundle {
         }
     }
 
-    pub fn uninstall(&self) -> IOResult<()> {
-        if contents_recognized(&self.dest, self.contents)? {
+    pub fn uninstall(&self, force: bool) -> IOResult<()> {
+        if force || contents_recognized(&self.dest, self.contents)? {
             use crate::CMDNAME;
             std::fs::remove_file(&self.dest)?;
             println!("{} {} uninstalled: {:?}", CMDNAME, self.name, &self.dest);
@@ -58,15 +58,17 @@ enum FileOrAlreadyExists {
     AlreadyExists,
 }
 
-fn open_if_non_existent(path: &Path) -> IOResult<FileOrAlreadyExists> {
+fn open_file(path: &Path, force: bool) -> IOResult<FileOrAlreadyExists> {
     use FileOrAlreadyExists::*;
 
-    let openres = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(path);
+    let mut openopts = std::fs::OpenOptions::new();
+    openopts.write(true);
 
-    match openres {
+    if !force {
+        openopts.create_new(true);
+    }
+
+    match openopts.open(path) {
         Ok(f) => Ok(File(f)),
         Err(e) => match e.kind() {
             std::io::ErrorKind::AlreadyExists => Ok(AlreadyExists),

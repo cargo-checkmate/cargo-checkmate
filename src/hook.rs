@@ -18,6 +18,10 @@ pub enum Hook {
 /// hook type option
 #[derive(Debug, StructOpt)]
 pub struct HookTypeOption {
+    /// Force modifying the hook even if the contents are unrecognized
+    #[structopt(long)]
+    force: bool,
+
     /// Hook type: all, git, or github-ci
     #[structopt(default_value)]
     hook_type: HookType,
@@ -45,15 +49,15 @@ impl Executable for Hook {
         use Hook::*;
 
         let results: Vec<IOResult<()>> = match self {
-            Install(HookTypeOption { hook_type }) => hook_type
+            Install(HookTypeOption { force, hook_type }) => hook_type
                 .source_bundles()?
                 .into_iter()
-                .map(|sb| sb.install())
+                .map(|sb| sb.install(*force))
                 .collect(),
-            Uninstall(HookTypeOption { hook_type }) => hook_type
+            Uninstall(HookTypeOption { force, hook_type }) => hook_type
                 .source_bundles()?
                 .into_iter()
-                .map(|sb| sb.uninstall())
+                .map(|sb| sb.uninstall(*force))
                 .collect(),
         };
 
