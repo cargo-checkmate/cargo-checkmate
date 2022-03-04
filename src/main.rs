@@ -3,15 +3,16 @@
 
 mod cdcrate;
 mod executable;
+#[allow(dead_code)] // DO NOT MERGE: for interim testing/dev.
 mod git;
-mod githook;
-mod githubci;
+mod hook;
 mod iohelpers;
 mod options;
 mod phase;
 mod readme;
 mod resultsdir;
 mod runner;
+#[allow(dead_code)] // DO NOT MERGE: for interim testing/dev.
 mod srcbundle;
 mod subcommands;
 
