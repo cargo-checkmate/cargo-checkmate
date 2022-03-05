@@ -3,12 +3,12 @@ use crate::IOResult;
 use std::path::PathBuf;
 
 pub(super) fn source_bundle() -> IOResult<SourceBundle> {
-    Ok(SourceBundle {
-        name: "GitHub CI",
-        dest: yaml_path()?,
-        contents: include_bytes!("github-ci.yaml"),
-        executable: false,
-    })
+    Ok(SourceBundle::new(
+        "GitHub CI",
+        "github-ci",
+        yaml_path()?,
+        false,
+    ))
 }
 
 fn yaml_path() -> IOResult<PathBuf> {

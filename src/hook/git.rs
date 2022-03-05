@@ -3,12 +3,12 @@ use crate::IOResult;
 use std::path::PathBuf;
 
 pub(super) fn source_bundle() -> IOResult<SourceBundle> {
-    Ok(SourceBundle {
-        name: "git-hook",
-        dest: hook_path()?,
-        contents: include_bytes!("githook-pre-commit.sh"),
-        executable: true,
-    })
+    Ok(SourceBundle::new(
+        "git-hook",
+        "git-hook.pre-commit",
+        hook_path()?,
+        true,
+    ))
 }
 
 fn hook_path() -> IOResult<PathBuf> {

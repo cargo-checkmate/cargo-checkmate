@@ -1,15 +1,39 @@
 use crate::IOResult;
+use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
+
+static BUNDLE_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/src/hook/bundles");
 
 #[derive(Debug)]
 pub struct SourceBundle {
-    pub name: &'static str,
-    pub dest: PathBuf,
-    pub contents: &'static [u8],
-    pub executable: bool,
+    name: &'static str,
+    dest: PathBuf,
+    executable: bool,
+    versions: Vec<&'static [u8]>,
+}
+
+/// An internal type for recognition status:
+use Recognition::*;
+
+#[derive(PartialEq, Eq)]
+enum Recognition {
+    Current,
+    Old,
+    Unrecognized,
 }
 
 impl SourceBundle {
+    pub fn new(name: &'static str, srcname: &str, dest: PathBuf, executable: bool) -> SourceBundle {
+        let versions = load_versions(srcname);
+
+        SourceBundle {
+            name,
+            dest,
+            executable,
+            versions,
+        }
+    }
+
     pub fn install(&self, force: bool) -> IOResult<()> {
         use crate::CMDNAME;
         use FileOrAlreadyExists::*;
@@ -19,36 +43,61 @@ impl SourceBundle {
             File(mut f) => {
                 use std::io::Write;
 
-                f.write_all(self.contents)?;
+                f.write_all(self.latest())?;
                 if self.executable {
                     make_executable(f)?;
                 }
                 println!("{} {} installed: {:?}", CMDNAME, self.name, &self.dest);
                 Ok(())
             }
-            AlreadyExists => {
-                if contents_recognized(&self.dest, self.contents)? {
+            AlreadyExists => match self.contents_recognized()? {
+                Current => {
                     println!(
                         "{} {} already installed: {:?}",
                         CMDNAME, self.name, &self.dest
                     );
                     Ok(())
-                } else {
-                    unrecognized_contents(self.name, &self.dest)
                 }
-            }
+                Old => {
+                    println!("{} {} upgrading from old version.", CMDNAME, self.name,);
+                    self.install(true)
+                }
+                Unrecognized => self.unrecognized_contents(),
+            },
         }
     }
 
     pub fn uninstall(&self, force: bool) -> IOResult<()> {
-        if force || contents_recognized(&self.dest, self.contents)? {
+        if force || self.contents_recognized()? != Unrecognized {
             use crate::CMDNAME;
             std::fs::remove_file(&self.dest)?;
             println!("{} {} uninstalled: {:?}", CMDNAME, self.name, &self.dest);
             Ok(())
         } else {
-            unrecognized_contents(self.name, &self.dest)
+            self.unrecognized_contents()
         }
+    }
+
+    fn contents_recognized(&self) -> IOResult<Recognition> {
+        let found = std::fs::read(&self.dest)?;
+        Ok(if found == self.latest() {
+            Current
+        } else if self.versions.iter().any(|x| **x == found) {
+            Old
+        } else {
+            Unrecognized
+        })
+    }
+
+    fn unrecognized_contents(&self) -> IOResult<()> {
+        use crate::{ioerror, CMDNAME};
+
+        println!("{} unrecognized {}: {:?}", CMDNAME, self.name, self.dest);
+        Err(ioerror!("Unrecognized {}: {:?}", self.name, self.dest))
+    }
+
+    fn latest(&self) -> &'static [u8] {
+        self.versions.last().unwrap()
     }
 }
 
@@ -87,14 +136,88 @@ fn make_executable(f: std::fs::File) -> IOResult<()> {
     Ok(())
 }
 
-fn contents_recognized(dest: &Path, contents: &[u8]) -> IOResult<bool> {
-    let found = std::fs::read(dest)?;
-    Ok(found == contents)
+// `load_versions` must not fail, but it may panic if passed incorrect parameters or a malformed
+// `hooksrc` directory. A unittest ensures that it does not panic.
+fn load_versions(srcname: &str) -> Vec<&'static [u8]> {
+    let verdir = BUNDLE_DIR
+        .get_dir(srcname)
+        .unwrap_or_else(|| panic!("srcname {:?} not found.", srcname));
+
+    let mut vslots = vec![];
+
+    for entry in verdir.entries() {
+        let path = entry.path();
+        let fname = unwrap_file_name_str(path);
+
+        // Each version must be named `v<N>`:
+        let verstr = fname.strip_prefix('v').unwrap_or_else(|| {
+            panic!(
+                "expected hooksrc version file `v<N>`; found {:?}",
+                path.display()
+            )
+        });
+
+        let version = {
+            use std::str::FromStr;
+
+            usize::from_str(verstr).unwrap_or_else(|_err| {
+                panic!(
+                    "expected hooksrc version file `v<N>`; found {:?}",
+                    path.display()
+                )
+            })
+        };
+
+        // Each version must be a file:
+        let file = entry
+            .as_file()
+            .unwrap_or_else(|| panic!("Expected a file: {:?}", path.display()));
+
+        if version >= vslots.len() {
+            vslots.resize(version + 1, None);
+        }
+
+        vslots[version] = Some(file.contents());
+    }
+
+    if vslots.is_empty() {
+        panic!("No versions found for {:?}", srcname);
+    }
+    let vslotslen = vslots.len();
+
+    // Any empty slots are an error:
+    let mut versions = vec![];
+    for (version, vslot) in vslots.into_iter().enumerate() {
+        let contents = vslot.unwrap_or_else(|| {
+            panic!(
+                "Gap in versions for {:?}; version {} absent.",
+                srcname, version
+            )
+        });
+        versions.push(contents);
+    }
+    assert_eq!(vslotslen, versions.len());
+
+    versions
 }
 
-fn unrecognized_contents(name: &str, dest: &Path) -> IOResult<()> {
-    use crate::{ioerror, CMDNAME};
+fn unwrap_file_name_str(p: &Path) -> &str {
+    p.file_name()
+        .unwrap_or_else(|| panic!("Path {:?} has no filename.", p.display()))
+        .to_str()
+        .unwrap_or_else(|| panic!("Path {:?} filename is not utf.", p.display()))
+}
 
-    println!("{} unrecognized {}: {:?}", CMDNAME, name, dest);
-    Err(ioerror!("Unrecongized {}: {:?}", name, dest))
+#[test]
+fn test_load_versions() {
+    for entry in BUNDLE_DIR.entries() {
+        let srcname = unwrap_file_name_str(entry.path());
+        assert!(
+            srcname == "git-hook.pre-commit" || srcname == "github-ci.yaml",
+            "Unexpected source bundle: {:?}",
+            srcname
+        );
+        // This should not panic:
+        load_versions(srcname);
+    }
 }
