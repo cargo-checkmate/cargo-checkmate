@@ -4,6 +4,7 @@ use std::io::Result;
 use std::path::PathBuf;
 
 mod phaseresult;
+use colored::Colorize;
 use phaseresult::PhaseResult;
 
 pub struct Runner {
@@ -59,13 +60,13 @@ impl Runner {
 
         let results = if output.status.success() {
             if output.stdout.starts_with(b"skipped:\n") {
-                println!("skipped.");
+                println!("{}.", "skipped".green());
             } else {
-                println!("ok.");
+                println!("{}.", "ok".green());
             }
             &mut self.passes
         } else {
-            println!("FAILED.");
+            println!("{}.", "FAILED".red());
             &mut self.fails
         };
 
@@ -79,7 +80,7 @@ impl Runner {
         let failcount = self.fails.len();
 
         let (exitstatus, label) = if failcount == 0 {
-            (0, "ok")
+            (0, "ok".green())
         } else {
             println!("\nfailures:\n");
 
@@ -87,7 +88,7 @@ impl Runner {
                 fres.display()?;
             }
 
-            (1, "FAILED")
+            (1, "FAILED".red())
         };
 
         println!(
