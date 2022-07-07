@@ -10,11 +10,11 @@ homepage = "https://github.com/nathan-at-least/cargo-checkmate"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-structopt = "0.3.21"
-abscissa_core = "0.5.2"
-cargo-audit = "0.14.1"
+structopt = "0.3.26"
+abscissa_core = "0.6.0"
+cargo-audit = "0.17.0"
 include_dir = "0.7.2"
 colored = "2.0.0"
 
 [dev-dependencies]
-test-case = "1.0.0"
+test-case = "2.1.0"
