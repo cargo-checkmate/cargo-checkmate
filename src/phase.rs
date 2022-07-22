@@ -1,7 +1,7 @@
 use crate::executable::Executable;
 use crate::IOResult;
+use clap::StructOpt;
 use std::fmt;
-use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 pub enum Phase {

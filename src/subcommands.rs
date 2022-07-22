@@ -20,9 +20,12 @@ pub fn audit(force: bool) -> std::io::Result<()> {
 
 fn force_audit() -> std::io::Result<()> {
     use abscissa_core::application::Application;
-    use cargo_audit::application::APPLICATION as AUDIT_APP;
+    use cargo_audit::application::APP as AUDIT_APP;
 
-    Application::run(&AUDIT_APP, vec![String::from("audit")]);
+    Application::run(
+        &AUDIT_APP,
+        vec![String::from("cargo"), String::from("audit")],
+    );
 
     Ok(())
 }

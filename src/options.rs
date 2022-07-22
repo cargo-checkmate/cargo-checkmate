@@ -3,8 +3,8 @@ use crate::hook::Hook;
 use crate::phase::Phase;
 use crate::readme::Readme;
 use crate::IOResult;
-use structopt::clap::AppSettings;
-use structopt::StructOpt;
+use clap::AppSettings;
+use clap::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -24,6 +24,7 @@ pub enum Subcommand {
     #[structopt(flatten)]
     Phase(Phase),
 
+    #[structopt(subcommand)]
     Hook(Hook),
     Readme(Readme),
 }

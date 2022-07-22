@@ -1,6 +1,6 @@
 use crate::executable::Executable;
 use crate::IOResult;
-use structopt::StructOpt;
+use clap::StructOpt;
 
 const README: &str = include_str!("../README.md");
 
