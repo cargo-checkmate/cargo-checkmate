@@ -100,6 +100,6 @@ impl Runner {
     }
 
     fn rellog_path(&self, phasename: &str, outkind: &str) -> PathBuf {
-        self.logdir.join(&format!("{}.{}", phasename, outkind))
+        self.logdir.join(format!("{}.{}", phasename, outkind))
     }
 }

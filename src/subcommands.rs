@@ -37,7 +37,7 @@ fn audit_if_necessary() -> std::io::Result<()> {
     {
         let stampdir = stamp.parent().unwrap();
         if !stampdir.is_dir() {
-            std::fs::create_dir_all(&stampdir)?;
+            std::fs::create_dir_all(stampdir)?;
         }
     }
 
