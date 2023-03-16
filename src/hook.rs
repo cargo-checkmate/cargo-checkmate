@@ -28,20 +28,15 @@ pub struct HookTypeOption {
 }
 
 /// hook type
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Default, StructOpt)]
 pub enum HookType {
     /// all hooks
+    #[default]
     All,
     /// git hooks
     Git,
     /// GitHub CI hooks
     GithubCI,
-}
-
-impl Default for HookType {
-    fn default() -> HookType {
-        HookType::All
-    }
 }
 
 impl Executable for Hook {
