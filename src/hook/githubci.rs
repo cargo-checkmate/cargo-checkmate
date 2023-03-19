@@ -24,3 +24,8 @@ fn git_toplevel() -> IOResult<PathBuf> {
     let s = crate::git::run(&["rev-parse", "--show-toplevel"])?;
     Ok(PathBuf::from(s.trim_end()))
 }
+
+#[test]
+fn test_source_bundle() {
+    source_bundle().unwrap();
+}

@@ -19,3 +19,8 @@ fn git_dir() -> IOResult<PathBuf> {
     let s = crate::git::run(&["rev-parse", "--git-dir"])?;
     Ok(PathBuf::from(s.trim_end()))
 }
+
+#[test]
+fn test_source_bundle() {
+    source_bundle().unwrap();
+}
