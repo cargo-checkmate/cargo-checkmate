@@ -4,9 +4,9 @@ use crate::phase::Phase;
 use crate::readme::Readme;
 use crate::IOResult;
 use clap::AppSettings;
-use clap::StructOpt;
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 #[structopt(
     setting = AppSettings::NoBinaryName,
     about = env!("CARGO_PKG_DESCRIPTION"),
@@ -16,7 +16,7 @@ pub struct Options {
     cmd: Option<Subcommand>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub enum Subcommand {
     /// Run all phases.
     Everything,

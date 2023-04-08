@@ -4,7 +4,7 @@ mod githubci;
 use crate::executable::Executable;
 use crate::srcbundle::SourceBundle;
 use crate::IOResult;
-use clap::{StructOpt, Subcommand};
+use clap::{Parser, Subcommand};
 
 /// manage repository hooks.
 #[derive(Debug, Subcommand)]
@@ -16,7 +16,7 @@ pub enum Hook {
 }
 
 /// hook type option
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct HookTypeOption {
     /// Force modifying the hook even if the contents are unrecognized
     #[structopt(long)]
@@ -28,7 +28,7 @@ pub struct HookTypeOption {
 }
 
 /// hook type
-#[derive(Debug, Default, StructOpt)]
+#[derive(Debug, Default, Parser)]
 pub enum HookType {
     /// all hooks
     #[default]
