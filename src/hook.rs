@@ -121,3 +121,6 @@ fn merge_std_errs(a: IOResult<()>, b: IOResult<()>) -> IOResult<()> {
         (Err(a), Err(b)) => Err(Error::new(Other, format!("{}\n{}", a, b))),
     }
 }
+
+#[cfg(test)]
+mod tests;
