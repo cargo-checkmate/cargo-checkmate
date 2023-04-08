@@ -28,7 +28,7 @@ pub enum Phase {
 
 #[derive(Debug, clap::Parser)]
 pub struct AuditOptions {
-    #[structopt(short, long, help = "Force an audit check.")]
+    #[clap(short, long, help = "Force an audit check.")]
     force: bool,
 }
 

@@ -18,11 +18,11 @@ pub enum Hook {
 #[derive(Debug, clap::Parser)]
 pub struct HookTypeOption {
     /// Force modifying the hook even if the contents are unrecognized
-    #[structopt(long)]
+    #[clap(long)]
     force: bool,
 
     /// Hook type: all, git, or github-ci
-    #[structopt(default_value_t)]
+    #[clap(default_value_t)]
     hook_type: HookType,
 }
 
@@ -74,7 +74,7 @@ impl HookType {
     }
 }
 
-// TODO: structopt/clap already knows how to format these, can we reuse that?
+// TODO: clap already knows how to format these, can we reuse that?
 impl std::fmt::Display for HookType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         use HookType::*;
@@ -91,7 +91,7 @@ impl std::fmt::Display for HookType {
     }
 }
 
-// TODO: structopt/clap already knows how to format these, can we reuse that?
+// TODO: clap already knows how to format these, can we reuse that?
 impl std::str::FromStr for HookType {
     type Err = String;
 

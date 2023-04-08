@@ -5,12 +5,12 @@ use crate::readme::Readme;
 use crate::IOResult;
 
 #[derive(Debug, clap::Parser)]
-#[structopt(
+#[clap(
     setting = clap::AppSettings::NoBinaryName,
     about = env!("CARGO_PKG_DESCRIPTION"),
 )]
 pub struct Options {
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     cmd: Option<Subcommand>,
 }
 
@@ -19,10 +19,10 @@ pub enum Subcommand {
     /// Run all phases.
     Everything,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     Phase(Phase),
 
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     Hook(Hook),
     Readme(Readme),
 }
