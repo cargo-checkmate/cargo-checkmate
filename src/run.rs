@@ -1,5 +1,5 @@
 /// Run the cli main process
-pub fn run() -> crate::IOResult<()> {
+pub fn run() -> std::io::Result<()> {
     use crate::executable::Executable;
     use crate::options::Options;
 

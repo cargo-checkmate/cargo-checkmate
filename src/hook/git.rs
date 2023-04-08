@@ -1,8 +1,8 @@
 use crate::srcbundle::SourceBundle;
-use crate::IOResult;
+
 use std::path::PathBuf;
 
-pub(super) fn source_bundle() -> IOResult<SourceBundle> {
+pub(super) fn source_bundle() -> std::io::Result<SourceBundle> {
     Ok(SourceBundle::new(
         "git-hook",
         "git-hook.pre-commit",
@@ -11,11 +11,11 @@ pub(super) fn source_bundle() -> IOResult<SourceBundle> {
     ))
 }
 
-fn hook_path() -> IOResult<PathBuf> {
+fn hook_path() -> std::io::Result<PathBuf> {
     Ok(git_dir()?.join("hooks").join("pre-commit"))
 }
 
-fn git_dir() -> IOResult<PathBuf> {
+fn git_dir() -> std::io::Result<PathBuf> {
     let s = crate::git::run(&["rev-parse", "--git-dir"])?;
     Ok(PathBuf::from(s.trim_end()))
 }

@@ -1,5 +1,5 @@
 use crate::executable::Executable;
-use crate::IOResult;
+
 use std::fmt;
 
 #[derive(Debug, clap::Parser)]
@@ -33,7 +33,7 @@ pub struct AuditOptions {
 }
 
 impl Phase {
-    pub fn execute_everything() -> IOResult<()> {
+    pub fn execute_everything() -> std::io::Result<()> {
         use crate::runner::Runner;
         use Phase::*;
 
@@ -60,7 +60,7 @@ impl Phase {
 }
 
 impl Executable for Phase {
-    fn execute(&self) -> IOResult<()> {
+    fn execute(&self) -> std::io::Result<()> {
         use crate::subcommands::{audit, cargo_builtin};
         use Phase::*;
 

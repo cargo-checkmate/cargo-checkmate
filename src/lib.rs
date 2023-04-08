@@ -15,7 +15,7 @@ mod runner;
 mod srcbundle;
 mod subcommands;
 
-pub use self::iohelpers::{invalid_input, invalid_input_error, IOResult};
+pub use self::iohelpers::{invalid_input, invalid_input_error};
 pub use self::run::run;
 pub use resultsdir::results_dir;
 

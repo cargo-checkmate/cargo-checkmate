@@ -3,7 +3,6 @@ mod githubci;
 
 use crate::executable::Executable;
 use crate::srcbundle::SourceBundle;
-use crate::IOResult;
 
 /// manage repository hooks.
 #[derive(Debug, clap::Subcommand)]
@@ -39,10 +38,10 @@ pub enum HookType {
 }
 
 impl Executable for Hook {
-    fn execute(&self) -> IOResult<()> {
+    fn execute(&self) -> std::io::Result<()> {
         use Hook::*;
 
-        let results: Vec<IOResult<()>> = match self {
+        let results: Vec<std::io::Result<()>> = match self {
             Install(HookTypeOption { force, hook_type }) => hook_type
                 .source_bundles()?
                 .into_iter()
@@ -60,7 +59,7 @@ impl Executable for Hook {
 }
 
 impl HookType {
-    fn source_bundles(&self) -> IOResult<Vec<SourceBundle>> {
+    fn source_bundles(&self) -> std::io::Result<Vec<SourceBundle>> {
         use HookType::*;
 
         Ok(match self {
@@ -107,7 +106,7 @@ impl std::str::FromStr for HookType {
     }
 }
 
-fn merge_std_errs(a: IOResult<()>, b: IOResult<()>) -> IOResult<()> {
+fn merge_std_errs(a: std::io::Result<()>, b: std::io::Result<()>) -> std::io::Result<()> {
     use std::io::{Error, ErrorKind::Other};
 
     match (a, b) {

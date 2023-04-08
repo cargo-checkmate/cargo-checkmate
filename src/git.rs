@@ -1,6 +1,4 @@
-use crate::IOResult;
-
-pub fn run(args: &[&str]) -> IOResult<String> {
+pub fn run(args: &[&str]) -> std::io::Result<String> {
     use crate::ioerror;
     use std::io::Write;
     use std::process::Command;

@@ -1,16 +1,16 @@
-use crate::{invalid_input, invalid_input_error, IOResult};
+use crate::{invalid_input, invalid_input_error};
 
-pub fn change_directory_to_crate_root() -> IOResult<()> {
+pub fn change_directory_to_crate_root() -> std::io::Result<()> {
     let cratedir = locate_crate_dir()?;
     std::env::set_current_dir(cratedir)?;
     Ok(())
 }
 
-fn locate_crate_dir() -> IOResult<String> {
+fn locate_crate_dir() -> std::io::Result<String> {
     parse(locate_project()?)
 }
 
-fn locate_project() -> IOResult<String> {
+fn locate_project() -> std::io::Result<String> {
     use std::io::Write;
     use std::process::Command;
 
@@ -27,7 +27,7 @@ fn locate_project() -> IOResult<String> {
     }
 }
 
-fn parse(lpout: String) -> IOResult<String> {
+fn parse(lpout: String) -> std::io::Result<String> {
     let prefix = "{\"root\":\"";
     let suffix = "Cargo.toml\"}\n";
     if lpout.starts_with(prefix) && lpout.ends_with(suffix) {
