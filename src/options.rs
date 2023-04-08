@@ -7,6 +7,7 @@ use crate::readme::Readme;
 #[clap(
     setting = clap::AppSettings::NoBinaryName,
     about = env!("CARGO_PKG_DESCRIPTION"),
+    version,
 )]
 pub struct Options {
     #[clap(subcommand)]
