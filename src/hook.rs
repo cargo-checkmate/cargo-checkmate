@@ -79,15 +79,12 @@ impl std::fmt::Display for HookType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         use HookType::*;
 
-        write!(
-            f,
-            "{}",
-            match self {
-                All => "all",
-                Git => "git",
-                GithubCI => "github-ci",
-            }
-        )
+        match self {
+            All => "all",
+            Git => "git",
+            GithubCI => "github-ci",
+        }
+        .fmt(f)
     }
 }
 
