@@ -1,9 +1,8 @@
 use crate::executable::Executable;
 use crate::IOResult;
-use clap::Parser;
 use std::fmt;
 
-#[derive(Debug, Parser)]
+#[derive(Debug, clap::Parser)]
 pub enum Phase {
     /// phase: `cargo check` syntax + type checking.
     Check,
@@ -27,7 +26,7 @@ pub enum Phase {
     Audit(AuditOptions),
 }
 
-#[derive(Debug, Parser)]
+#[derive(Debug, clap::Parser)]
 pub struct AuditOptions {
     #[structopt(short, long, help = "Force an audit check.")]
     force: bool,

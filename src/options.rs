@@ -3,12 +3,10 @@ use crate::hook::Hook;
 use crate::phase::Phase;
 use crate::readme::Readme;
 use crate::IOResult;
-use clap::AppSettings;
-use clap::Parser;
 
-#[derive(Debug, Parser)]
+#[derive(Debug, clap::Parser)]
 #[structopt(
-    setting = AppSettings::NoBinaryName,
+    setting = clap::AppSettings::NoBinaryName,
     about = env!("CARGO_PKG_DESCRIPTION"),
 )]
 pub struct Options {
@@ -16,7 +14,7 @@ pub struct Options {
     cmd: Option<Subcommand>,
 }
 
-#[derive(Debug, Parser)]
+#[derive(Debug, clap::Parser)]
 pub enum Subcommand {
     /// Run all phases.
     Everything,
@@ -42,11 +40,15 @@ impl Options {
             it.next();
         }
 
-        Self::from_clap(
-            &Self::clap()
-                .bin_name("cargo-checkmate")
-                .get_matches_from(it),
-        )
+        {
+            use clap::Parser;
+
+            Self::from_clap(
+                &Self::clap()
+                    .bin_name("cargo-checkmate")
+                    .get_matches_from(it),
+            )
+        }
     }
 }
 
