@@ -10,20 +10,13 @@ mod options;
 mod phase;
 mod readme;
 mod resultsdir;
+mod run;
 mod runner;
 mod srcbundle;
 mod subcommands;
 
-pub use crate::iohelpers::{invalid_input, invalid_input_error, IOResult};
+pub use self::iohelpers::{invalid_input, invalid_input_error, IOResult};
+pub use self::run::run;
 pub use resultsdir::results_dir;
 
 const CMDNAME: &str = env!("CARGO_PKG_NAME");
-
-fn main() -> IOResult<()> {
-    use crate::executable::Executable;
-    use crate::options::Options;
-
-    crate::cdcrate::change_directory_to_crate_root()?;
-    let opts = Options::parse_args();
-    opts.execute()
-}
