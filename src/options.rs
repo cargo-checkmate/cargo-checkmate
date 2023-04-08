@@ -3,28 +3,26 @@ use crate::hook::Hook;
 use crate::phase::Phase;
 use crate::readme::Readme;
 use crate::IOResult;
-use clap::AppSettings;
-use clap::StructOpt;
 
-#[derive(Debug, StructOpt)]
-#[structopt(
-    setting = AppSettings::NoBinaryName,
+#[derive(Debug, clap::Parser)]
+#[clap(
+    setting = clap::AppSettings::NoBinaryName,
     about = env!("CARGO_PKG_DESCRIPTION"),
 )]
 pub struct Options {
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     cmd: Option<Subcommand>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Parser)]
 pub enum Subcommand {
     /// Run all phases.
     Everything,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     Phase(Phase),
 
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     Hook(Hook),
     Readme(Readme),
 }
@@ -42,11 +40,15 @@ impl Options {
             it.next();
         }
 
-        Self::from_clap(
-            &Self::clap()
-                .bin_name("cargo-checkmate")
-                .get_matches_from(it),
-        )
+        {
+            use clap::Parser;
+
+            Self::from_clap(
+                &Self::clap()
+                    .bin_name("cargo-checkmate")
+                    .get_matches_from(it),
+            )
+        }
     }
 }
 

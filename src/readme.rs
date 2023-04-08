@@ -1,10 +1,9 @@
 use crate::executable::Executable;
 use crate::IOResult;
-use clap::StructOpt;
 
 const README: &str = include_str!("../README.md");
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Parser)]
 /// Display the project README.md
 pub struct Readme {}
 

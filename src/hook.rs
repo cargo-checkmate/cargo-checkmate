@@ -4,10 +4,9 @@ mod githubci;
 use crate::executable::Executable;
 use crate::srcbundle::SourceBundle;
 use crate::IOResult;
-use clap::{StructOpt, Subcommand};
 
 /// manage repository hooks.
-#[derive(Debug, Subcommand)]
+#[derive(Debug, clap::Subcommand)]
 pub enum Hook {
     /// install repository hooks
     Install(HookTypeOption),
@@ -16,19 +15,19 @@ pub enum Hook {
 }
 
 /// hook type option
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Parser)]
 pub struct HookTypeOption {
     /// Force modifying the hook even if the contents are unrecognized
-    #[structopt(long)]
+    #[clap(long)]
     force: bool,
 
     /// Hook type: all, git, or github-ci
-    #[structopt(default_value_t)]
+    #[clap(default_value_t)]
     hook_type: HookType,
 }
 
 /// hook type
-#[derive(Debug, Default, StructOpt)]
+#[derive(Debug, Default, clap::Parser)]
 pub enum HookType {
     /// all hooks
     #[default]
@@ -75,24 +74,21 @@ impl HookType {
     }
 }
 
-// TODO: structopt/clap already knows how to format these, can we reuse that?
+// TODO: clap already knows how to format these, can we reuse that?
 impl std::fmt::Display for HookType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         use HookType::*;
 
-        write!(
-            f,
-            "{}",
-            match self {
-                All => "all",
-                Git => "git",
-                GithubCI => "github-ci",
-            }
-        )
+        match self {
+            All => "all",
+            Git => "git",
+            GithubCI => "github-ci",
+        }
+        .fmt(f)
     }
 }
 
-// TODO: structopt/clap already knows how to format these, can we reuse that?
+// TODO: clap already knows how to format these, can we reuse that?
 impl std::str::FromStr for HookType {
     type Err = String;
 
