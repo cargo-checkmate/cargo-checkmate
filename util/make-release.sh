@@ -8,7 +8,7 @@ WORKDIR=''
 
 function main
 {
-  [ $# = 1 ] || fail "Wrong number of arguments. Expected: $SCRIPT <new version>" 
+  [ $# = 1 ] || fail "Wrong number of arguments. Expected: $SCRIPT <new version>"
   local newver="$1"
 
   init-workdir
@@ -20,7 +20,7 @@ function main
 
   vrun git add "$REPODIR"/Cargo.{toml,lock}
   vrun git commit -m "New Release: $newver"
-  vrun git tag --sign -m "Release $newver" "$newver"
+  vrun git tag "v${newver}"
   vrun git log -1
 }
 
