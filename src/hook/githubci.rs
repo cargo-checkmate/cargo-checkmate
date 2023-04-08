@@ -5,7 +5,7 @@ use std::path::PathBuf;
 pub(super) fn source_bundle() -> IOResult<SourceBundle> {
     Ok(SourceBundle::new(
         "GitHub CI",
-        "github-ci",
+        "github-ci.yaml",
         yaml_path()?,
         false,
     ))
