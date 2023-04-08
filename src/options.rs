@@ -2,7 +2,6 @@ use crate::executable::Executable;
 use crate::hook::Hook;
 use crate::phase::Phase;
 use crate::readme::Readme;
-use crate::IOResult;
 
 #[derive(Debug, clap::Parser)]
 #[clap(
@@ -53,14 +52,14 @@ impl Options {
 }
 
 impl Executable for Options {
-    fn execute(&self) -> IOResult<()> {
+    fn execute(&self) -> std::io::Result<()> {
         let default = Subcommand::Everything;
         self.cmd.as_ref().unwrap_or(&default).execute()
     }
 }
 
 impl Executable for Subcommand {
-    fn execute(&self) -> IOResult<()> {
+    fn execute(&self) -> std::io::Result<()> {
         match self {
             Subcommand::Everything => Phase::execute_everything(),
             Subcommand::Phase(x) => x.execute(),

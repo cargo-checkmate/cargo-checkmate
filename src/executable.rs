@@ -1,5 +1,3 @@
-use crate::IOResult;
-
 pub trait Executable {
-    fn execute(&self) -> IOResult<()>;
+    fn execute(&self) -> std::io::Result<()>;
 }

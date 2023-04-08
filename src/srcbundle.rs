@@ -1,4 +1,3 @@
-use crate::IOResult;
 use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
 
@@ -34,7 +33,7 @@ impl SourceBundle {
         }
     }
 
-    pub fn install(&self, force: bool) -> IOResult<()> {
+    pub fn install(&self, force: bool) -> std::io::Result<()> {
         use crate::CMDNAME;
         use FileOrAlreadyExists::*;
 
@@ -67,7 +66,7 @@ impl SourceBundle {
         }
     }
 
-    pub fn uninstall(&self, force: bool) -> IOResult<()> {
+    pub fn uninstall(&self, force: bool) -> std::io::Result<()> {
         if force || self.contents_recognized()? != Unrecognized {
             use crate::CMDNAME;
             std::fs::remove_file(&self.dest)?;
@@ -78,7 +77,7 @@ impl SourceBundle {
         }
     }
 
-    fn contents_recognized(&self) -> IOResult<Recognition> {
+    fn contents_recognized(&self) -> std::io::Result<Recognition> {
         let found = std::fs::read(&self.dest)?;
         Ok(if found == self.latest() {
             Current
@@ -89,7 +88,7 @@ impl SourceBundle {
         })
     }
 
-    fn unrecognized_contents(&self) -> IOResult<()> {
+    fn unrecognized_contents(&self) -> std::io::Result<()> {
         use crate::{ioerror, CMDNAME};
 
         println!("{} unrecognized {}: {:?}", CMDNAME, self.name, self.dest);
@@ -107,7 +106,7 @@ enum FileOrAlreadyExists {
     AlreadyExists,
 }
 
-fn open_file(path: &Path, force: bool) -> IOResult<FileOrAlreadyExists> {
+fn open_file(path: &Path, force: bool) -> std::io::Result<FileOrAlreadyExists> {
     use FileOrAlreadyExists::*;
 
     let mut openopts = std::fs::OpenOptions::new();
@@ -126,7 +125,7 @@ fn open_file(path: &Path, force: bool) -> IOResult<FileOrAlreadyExists> {
     }
 }
 
-fn make_executable(f: std::fs::File) -> IOResult<()> {
+fn make_executable(f: std::fs::File) -> std::io::Result<()> {
     use std::os::unix::fs::PermissionsExt;
 
     let mut perms = f.metadata()?.permissions();

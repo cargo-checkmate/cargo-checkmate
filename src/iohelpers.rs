@@ -1,5 +1,3 @@
-pub use std::io::Result as IOResult;
-
 #[macro_export]
 macro_rules! ioerror {
     ( $tmpl:expr, $( $arg:expr ),* ) => {
@@ -7,7 +5,7 @@ macro_rules! ioerror {
     }
 }
 
-pub fn invalid_input<T, E>(reason: &str, input: E) -> IOResult<T>
+pub fn invalid_input<T, E>(reason: &str, input: E) -> std::io::Result<T>
 where
     E: std::fmt::Debug,
 {
