@@ -1,16 +1,16 @@
+use anyhow_std::CommandAnyhow;
 use std::path::Path;
+use std::process::Command;
 use std::time::{Duration, SystemTime};
 
 const AUDIT_EXPIRATION_TIMEOUT_SECS: u64 = 60 * 60 * 3;
 
-pub fn cargo_builtin(args: &[&str]) -> std::io::Result<()> {
-    use std::process::{exit, Command};
-
-    let status = Command::new("cargo").args(args).status()?;
-    exit(status.code().unwrap_or(-1));
+pub fn cargo_builtin(args: &[&str]) -> anyhow::Result<()> {
+    let status = Command::new("cargo").args(args).status_anyhow()?;
+    status.exit();
 }
 
-pub fn audit(force: bool) -> std::io::Result<()> {
+pub fn audit(force: bool) -> anyhow::Result<()> {
     if force {
         force_audit()
     } else {
@@ -18,7 +18,7 @@ pub fn audit(force: bool) -> std::io::Result<()> {
     }
 }
 
-fn force_audit() -> std::io::Result<()> {
+fn force_audit() -> anyhow::Result<()> {
     use abscissa_core::application::Application;
     use cargo_audit::application::APP as AUDIT_APP;
 
@@ -30,9 +30,7 @@ fn force_audit() -> std::io::Result<()> {
     Ok(())
 }
 
-fn audit_if_necessary() -> std::io::Result<()> {
-    use std::process::Command;
-
+fn audit_if_necessary() -> anyhow::Result<()> {
     let stamp = crate::results_dir().join("audit.timestamp");
     {
         let stampdir = stamp.parent().unwrap();
@@ -56,14 +54,17 @@ fn audit_if_necessary() -> std::io::Result<()> {
 
     if expired || stale {
         let exe = std::env::current_exe()?;
-        let status = Command::new(exe).arg("audit").arg("--force").status()?;
+        let status = Command::new(exe)
+            .arg("audit")
+            .arg("--force")
+            .status_anyhow()?;
 
         if status.success() {
             // Touch the timestamp path:
             std::fs::File::create(stamp)?;
         }
 
-        std::process::exit(status.code().unwrap());
+        status.exit();
     } else {
         // stamp is recent and newer than lockfile:
         println!("skipped:\nFound recent timestamp: {:?}", stamp);
@@ -71,10 +72,12 @@ fn audit_if_necessary() -> std::io::Result<()> {
     }
 }
 
-fn modified<P: AsRef<Path>>(p: P) -> std::io::Result<SystemTime> {
+fn modified<P: AsRef<Path>>(p: P) -> anyhow::Result<SystemTime> {
+    use anyhow_std::PathAnyhow;
+
     let pref = p.as_ref();
     if pref.exists() {
-        pref.metadata()?.modified()
+        pref.metadata_anyhow()?.modified()
     } else {
         Ok(SystemTime::UNIX_EPOCH)
     }

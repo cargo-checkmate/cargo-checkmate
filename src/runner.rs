@@ -1,6 +1,6 @@
 use crate::phase::Phase;
 use crate::CMDNAME;
-use std::io::Result;
+use anyhow::Result;
 use std::path::PathBuf;
 
 mod phaseresult;
@@ -33,6 +33,7 @@ impl Runner {
     }
 
     pub fn run_phase(&mut self, phase: &Phase) -> Result<()> {
+        use anyhow_std::CommandAnyhow;
         use std::process::Command;
 
         let phasename = &phase.to_string();
@@ -45,7 +46,7 @@ impl Runner {
             std::io::stdout().flush()?;
         }
 
-        let output = Command::new(exec).arg(phasename).output()?;
+        let output = Command::new(exec).arg(phasename).output_anyhow()?;
 
         let reloutlog = self.rellog_path(phasename, "stdout");
         let relerrlog = self.rellog_path(phasename, "stderr");

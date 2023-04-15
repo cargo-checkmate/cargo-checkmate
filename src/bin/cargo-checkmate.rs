@@ -1,3 +1,3 @@
-fn main() -> std::io::Result<()> {
+fn main() -> anyhow::Result<()> {
     cargo_checkmate::run()
 }

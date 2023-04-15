@@ -33,7 +33,7 @@ impl SourceBundle {
         }
     }
 
-    pub fn install(&self, force: bool) -> std::io::Result<()> {
+    pub fn install(&self, force: bool) -> anyhow::Result<()> {
         use crate::CMDNAME;
         use FileOrAlreadyExists::*;
 
@@ -66,7 +66,7 @@ impl SourceBundle {
         }
     }
 
-    pub fn uninstall(&self, force: bool) -> std::io::Result<()> {
+    pub fn uninstall(&self, force: bool) -> anyhow::Result<()> {
         if force || self.contents_recognized()? != Unrecognized {
             use crate::CMDNAME;
             std::fs::remove_file(&self.dest)?;
@@ -77,7 +77,7 @@ impl SourceBundle {
         }
     }
 
-    fn contents_recognized(&self) -> std::io::Result<Recognition> {
+    fn contents_recognized(&self) -> anyhow::Result<Recognition> {
         let found = std::fs::read(&self.dest)?;
         Ok(if found == self.latest() {
             Current
@@ -88,11 +88,11 @@ impl SourceBundle {
         })
     }
 
-    fn unrecognized_contents(&self) -> std::io::Result<()> {
-        use crate::{ioerror, CMDNAME};
-
-        println!("{} unrecognized {}: {:?}", CMDNAME, self.name, self.dest);
-        Err(ioerror!("Unrecognized {}: {:?}", self.name, self.dest))
+    fn unrecognized_contents(&self) -> anyhow::Result<()> {
+        let error = anyhow::anyhow!("unrecognized {}", self.name)
+            .context(format!("dest: {:?}", self.dest.display()));
+        println!("{} {:#}", crate::CMDNAME, &error);
+        Err(error)
     }
 
     fn latest(&self) -> &'static [u8] {
@@ -106,7 +106,7 @@ enum FileOrAlreadyExists {
     AlreadyExists,
 }
 
-fn open_file(path: &Path, force: bool) -> std::io::Result<FileOrAlreadyExists> {
+fn open_file(path: &Path, force: bool) -> anyhow::Result<FileOrAlreadyExists> {
     use FileOrAlreadyExists::*;
 
     let mut openopts = std::fs::OpenOptions::new();
@@ -120,12 +120,12 @@ fn open_file(path: &Path, force: bool) -> std::io::Result<FileOrAlreadyExists> {
         Ok(f) => Ok(File(f)),
         Err(e) => match e.kind() {
             std::io::ErrorKind::AlreadyExists => Ok(AlreadyExists),
-            _ => Err(e),
+            _ => Err(anyhow::Error::new(e)),
         },
     }
 }
 
-fn make_executable(f: std::fs::File) -> std::io::Result<()> {
+fn make_executable(f: std::fs::File) -> anyhow::Result<()> {
     use std::os::unix::fs::PermissionsExt;
 
     let mut perms = f.metadata()?.permissions();

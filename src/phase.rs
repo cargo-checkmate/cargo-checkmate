@@ -33,7 +33,7 @@ pub struct AuditOptions {
 }
 
 impl Phase {
-    pub fn execute_everything() -> std::io::Result<()> {
+    pub fn execute_everything() -> anyhow::Result<()> {
         use crate::runner::Runner;
         use Phase::*;
 
@@ -60,7 +60,7 @@ impl Phase {
 }
 
 impl Executable for Phase {
-    fn execute(&self) -> std::io::Result<()> {
+    fn execute(&self) -> anyhow::Result<()> {
         use crate::subcommands::{audit, cargo_builtin};
         use Phase::*;
 
