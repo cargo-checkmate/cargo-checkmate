@@ -25,7 +25,7 @@ jobs:
         with:
           phase: build
       - run: git status
-      - run: git log --pretty 'format:%Cred%h%Creset %C(yellow)%ai%Creset - %s <%C(bold blue)%ae%Creset>%Cgreen%d%Creset' --graph -10
+      - run: git log --pretty='%Cred%h%Creset %C(yellow)%ai%Creset - %s <%C(bold blue)%ae%Creset>%Cgreen%d%Creset' --graph -10
       - name: cargo checkmate test
         uses: cargo-checkmate/action@main
         with:
