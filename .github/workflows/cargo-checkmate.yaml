@@ -7,4 +7,12 @@ jobs:
     name: cargo-checkmate
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: cargo-checkmate/action@v1
+      - run: cargo checkmate check
+      - run: cargo checkmate format
+      - run: cargo checkmate clippy
+      - run: cargo checkmate build
+      - run: cargo checkmate test
+      - run: cargo checkmate doc
+      - run: cargo checkmate audit
