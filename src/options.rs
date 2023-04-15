@@ -53,14 +53,14 @@ impl Options {
 }
 
 impl Executable for Options {
-    fn execute(&self) -> std::io::Result<()> {
+    fn execute(&self) -> anyhow::Result<()> {
         let default = Subcommand::Everything;
         self.cmd.as_ref().unwrap_or(&default).execute()
     }
 }
 
 impl Executable for Subcommand {
-    fn execute(&self) -> std::io::Result<()> {
+    fn execute(&self) -> anyhow::Result<()> {
         match self {
             Subcommand::Everything => Phase::execute_everything(),
             Subcommand::Phase(x) => x.execute(),

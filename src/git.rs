@@ -1,9 +1,10 @@
-pub fn run(args: &[&str]) -> std::io::Result<String> {
-    use crate::ioerror;
+pub fn run(args: &[&str]) -> anyhow::Result<String> {
+    use anyhow::Context;
+    use anyhow_std::CommandAnyhow;
     use std::io::Write;
     use std::process::Command;
 
-    let gitout = Command::new("git").args(args).output()?;
+    let gitout = Command::new("git").args(args).output_anyhow()?;
 
     let errbytes = &gitout.stderr[..];
 
@@ -11,9 +12,9 @@ pub fn run(args: &[&str]) -> std::io::Result<String> {
     std::io::stderr().write_all(errbytes)?;
 
     if gitout.status.success() && errbytes.is_empty() {
-        String::from_utf8(gitout.stdout).map_err(|e| ioerror!("{:?} git-dir not utf8", e))
+        String::from_utf8(gitout.stdout).with_context(|| "git-dir not utf8".to_string())
     } else {
-        Err(ioerror!(
+        Err(anyhow::anyhow!(
             "git {} exit {}{}",
             args.join(" "),
             gitout

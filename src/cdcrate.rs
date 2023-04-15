@@ -1,33 +1,36 @@
-use crate::{invalid_input, invalid_input_error};
+use anyhow::Context;
 
-pub fn change_directory_to_crate_root() -> std::io::Result<()> {
+pub fn change_directory_to_crate_root() -> anyhow::Result<()> {
     let cratedir = locate_crate_dir()?;
     std::env::set_current_dir(cratedir)?;
     Ok(())
 }
 
-fn locate_crate_dir() -> std::io::Result<String> {
+fn locate_crate_dir() -> anyhow::Result<String> {
     parse(locate_project()?)
 }
 
-fn locate_project() -> std::io::Result<String> {
+fn locate_project() -> anyhow::Result<String> {
+    use anyhow_std::CommandAnyhow;
     use std::io::Write;
     use std::process::Command;
 
-    let r = Command::new("cargo").arg("locate-project").output()?;
+    let r = Command::new("cargo")
+        .arg("locate-project")
+        .output_anyhow()?;
 
     // Write stderr output no matter what:
     std::io::stderr().write_all(&r.stderr[..])?;
 
     if r.status.success() {
         String::from_utf8(r.stdout)
-            .map_err(|e| invalid_input_error("cargo locate project produced non-utf8", e))
+            .with_context(|| "cargo locate project produced non-utf8".to_string())
     } else {
-        invalid_input("cargo locate-project exit status", r.status)
+        Err(anyhow::anyhow!("cargo locate-project exit status").context(r.status))
     }
 }
 
-fn parse(lpout: String) -> std::io::Result<String> {
+fn parse(lpout: String) -> anyhow::Result<String> {
     let prefix = "{\"root\":\"";
     let suffix = "Cargo.toml\"}\n";
     if lpout.starts_with(prefix) && lpout.ends_with(suffix) {
@@ -35,6 +38,6 @@ fn parse(lpout: String) -> std::io::Result<String> {
         let (y, _) = x.split_at(x.len() - suffix.len());
         Ok(String::from(y))
     } else {
-        invalid_input("Could not parse cargo locate-project output", lpout)
+        Err(anyhow::anyhow!("Could not parse cargo locate-project output").context(lpout))
     }
 }

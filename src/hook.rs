@@ -38,10 +38,10 @@ pub enum HookType {
 }
 
 impl Executable for Hook {
-    fn execute(&self) -> std::io::Result<()> {
+    fn execute(&self) -> anyhow::Result<()> {
         use Hook::*;
 
-        let results: Vec<std::io::Result<()>> = match self {
+        let results: Vec<anyhow::Result<()>> = match self {
             Install(HookTypeOption { force, hook_type }) => hook_type
                 .source_bundles()?
                 .into_iter()
@@ -54,12 +54,12 @@ impl Executable for Hook {
                 .collect(),
         };
 
-        results.into_iter().fold(Ok(()), merge_std_errs)
+        results.into_iter().fold(Ok(()), merge_results)
     }
 }
 
 impl HookType {
-    fn source_bundles(&self) -> std::io::Result<Vec<SourceBundle>> {
+    fn source_bundles(&self) -> anyhow::Result<Vec<SourceBundle>> {
         use HookType::*;
 
         Ok(match self {
@@ -106,14 +106,12 @@ impl std::str::FromStr for HookType {
     }
 }
 
-fn merge_std_errs(a: std::io::Result<()>, b: std::io::Result<()>) -> std::io::Result<()> {
-    use std::io::{Error, ErrorKind::Other};
-
+fn merge_results(a: anyhow::Result<()>, b: anyhow::Result<()>) -> anyhow::Result<()> {
     match (a, b) {
         (Ok(()), Ok(())) => Ok(()),
         (Ok(()), err) => err,
         (err, Ok(())) => err,
-        (Err(a), Err(b)) => Err(Error::new(Other, format!("{}\n{}", a, b))),
+        (Err(a), Err(b)) => Err(anyhow::anyhow!("{:#}\n{:#}", a, b)),
     }
 }
 

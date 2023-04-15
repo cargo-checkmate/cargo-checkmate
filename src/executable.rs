@@ -1,3 +1,3 @@
 pub trait Executable {
-    fn execute(&self) -> std::io::Result<()>;
+    fn execute(&self) -> anyhow::Result<()>;
 }

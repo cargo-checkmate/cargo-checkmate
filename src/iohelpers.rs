@@ -5,7 +5,7 @@ macro_rules! ioerror {
     }
 }
 
-pub fn invalid_input<T, E>(reason: &str, input: E) -> std::io::Result<T>
+pub fn invalid_input<T, E>(reason: &str, input: E) -> anyhow::Result<T>
 where
     E: std::fmt::Debug,
 {

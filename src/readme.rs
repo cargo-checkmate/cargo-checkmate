@@ -7,9 +7,10 @@ const README: &str = include_str!("../README.md");
 pub struct Readme {}
 
 impl Executable for Readme {
-    fn execute(&self) -> std::io::Result<()> {
+    fn execute(&self) -> anyhow::Result<()> {
         use std::io::Write;
 
-        std::io::stdout().write_all(README.as_bytes())
+        std::io::stdout().write_all(README.as_bytes())?;
+        Ok(())
     }
 }
