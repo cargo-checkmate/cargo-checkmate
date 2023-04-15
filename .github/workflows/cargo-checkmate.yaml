@@ -7,4 +7,4 @@ jobs:
     name: cargo-checkmate
     runs-on: ubuntu-latest
     steps:
-      - uses: cargo-checkmate/action@v2
+      - uses: cargo-checkmate/action@v1
