@@ -24,8 +24,13 @@ jobs:
         uses: cargo-checkmate/action@main
         with:
           phase: build
+
+      - run: ls -ld /github/workspace
       - run: git status
       - run: git log --pretty='%Cred%h%Creset %C(yellow)%ai%Creset - %s <%C(bold blue)%ae%Creset>%Cgreen%d%Creset' --graph -10
+      - run: git rev-parse --git-dir
+      - run: git rev-parse --show-toplevel
+
       - name: cargo checkmate test
         uses: cargo-checkmate/action@main
         with:
