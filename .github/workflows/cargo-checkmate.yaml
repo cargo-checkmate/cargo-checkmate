@@ -9,10 +9,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: cargo-checkmate/action@main
-      - run: cargo checkmate check
-      - run: cargo checkmate format
-      - run: cargo checkmate clippy
-      - run: cargo checkmate build
-      - run: cargo checkmate test
-      - run: cargo checkmate doc
-      - run: cargo checkmate audit
+        with:
+          phase: check
+      - uses: cargo-checkmate/action@main
+        with:
+          phase: format
+      - uses: cargo-checkmate/action@main
+        with:
+          phase: clippy
+      - uses: cargo-checkmate/action@main
+        with:
+          phase: build
+      - uses: cargo-checkmate/action@main
+        with:
+          phase: test
+      - uses: cargo-checkmate/action@main
+        with:
+          phase: doc
+      - uses: cargo-checkmate/action@main
+        with:
+          phase: audit
