@@ -8,24 +8,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: cargo-checkmate/action@main
+      - name: cargo checkmate check
+        uses: cargo-checkmate/action@main
         with:
           phase: check
-      - uses: cargo-checkmate/action@main
+      - name: cargo checkmate format
+        uses: cargo-checkmate/action@main
         with:
           phase: format
-      - uses: cargo-checkmate/action@main
+      - name: cargo checkmate clippy
+        uses: cargo-checkmate/action@main
         with:
           phase: clippy
-      - uses: cargo-checkmate/action@main
+      - name: cargo checkmate build
+        uses: cargo-checkmate/action@main
         with:
           phase: build
-      - uses: cargo-checkmate/action@main
+      - run: git status
+      - run: git log --pretty 'format:%Cred%h%Creset %C(yellow)%ai%Creset - %s <%C(bold blue)%ae%Creset>%Cgreen%d%Creset' --graph -10
+      - name: cargo checkmate test
+        uses: cargo-checkmate/action@main
         with:
           phase: test
-      - uses: cargo-checkmate/action@main
+      - name: cargo checkmate doc
+        uses: cargo-checkmate/action@main
         with:
           phase: doc
-      - uses: cargo-checkmate/action@main
+      - name: cargo checkmate audit
+        uses: cargo-checkmate/action@main
         with:
           phase: audit
