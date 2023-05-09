@@ -1,6 +1,6 @@
 name: prototype cargo-checkmate action ci
 
-on: [pull_request, push]
+on: pull_request
 
 jobs:
   cargo-checkmate:
@@ -16,4 +16,3 @@ jobs:
         uses: cargo-checkmate/action@use-checkmate-ghcr-image
         with:
           phase: build
-```
