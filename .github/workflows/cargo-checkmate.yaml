@@ -1,6 +1,6 @@
 name: prototype cargo-checkmate action ci
 
-on: pull_request
+on: [pull_request, push]
 
 jobs:
   cargo-checkmate:
