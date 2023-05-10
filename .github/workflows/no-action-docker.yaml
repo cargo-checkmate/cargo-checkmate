@@ -1,11 +1,12 @@
 on: pull_request
 
-name: cargo-checkmate Continuous Integration (build-checkmate)
+name: cargo-checkmate Continuous Integration (no-action parallel docker)
 
 jobs:
-  cargo-checkmate-build-checkmate:
-    name: cargo-checkmate-build-checkmate
-    runs-on: ubuntu-latest
+  cargo-checkmate-no-action-parallel-docker
+    name: cargo-checkmate-no-action-parallel-docker
+    docker:
+      - image: ghcr.io/cargo-checkmate/cargo-checkmate
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -21,3 +22,4 @@ jobs:
       - run: cargo-checkmate test
       - run: cargo-checkmate doc
       - run: cargo-checkmate audit
+

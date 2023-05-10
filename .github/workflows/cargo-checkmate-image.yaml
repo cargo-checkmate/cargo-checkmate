@@ -8,7 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: cargo checkmate clippy
+      - name: cargo checkmate build
+        uses: cargo-checkmate/action@use-checkmate-ghcr-image
+        with:
+          phase: check
+      - name: cargo checkmate build
+        uses: cargo-checkmate/action@use-checkmate-ghcr-image
+        with:
+          phase: format
+      - name: cargo checkmate build
         uses: cargo-checkmate/action@use-checkmate-ghcr-image
         with:
           phase: clippy
@@ -16,3 +24,15 @@ jobs:
         uses: cargo-checkmate/action@use-checkmate-ghcr-image
         with:
           phase: build
+      - name: cargo checkmate build
+        uses: cargo-checkmate/action@use-checkmate-ghcr-image
+        with:
+          phase: test
+      - name: cargo checkmate build
+        uses: cargo-checkmate/action@use-checkmate-ghcr-image
+        with:
+          phase: doc
+      - name: cargo checkmate build
+        uses: cargo-checkmate/action@use-checkmate-ghcr-image
+        with:
+          phase: audit
