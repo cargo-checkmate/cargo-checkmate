@@ -1,6 +1,6 @@
-on: pull_request
-
 name: cargo-checkmate Continuous Integration (build-checkmate)
+
+on: pull_request
 
 jobs:
   cargo-checkmate-build-checkmate:

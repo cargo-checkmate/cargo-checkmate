@@ -1,9 +1,9 @@
-on: pull_request
-
 name: cargo-checkmate Continuous Integration (no-action parallel docker)
 
+on: pull_request
+
 jobs:
-  cargo-checkmate-no-action-parallel-docker
+  cargo-checkmate-no-action-parallel-docker:
     name: cargo-checkmate-no-action-parallel-docker
     docker:
       - image: ghcr.io/cargo-checkmate/cargo-checkmate
