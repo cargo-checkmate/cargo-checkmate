@@ -4,6 +4,7 @@ on: pull_request
 
 jobs:
   setup:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -14,29 +15,36 @@ jobs:
       - run: cargo install cargo-checkmate
   check:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate check
   format:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate format
   clippy:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate clippy
   build:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate build
   test:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate test
   doc:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate doc
   audit:
     needs: setup
+    runs-on: ubuntu-latest
     steps:
       - run: cargo-checkmate audit
