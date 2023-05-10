@@ -1,6 +1,6 @@
 name: single-host-serial
 
-on: pull_request
+on: push
 
 jobs:
   cargo-checkmate-build-checkmate:

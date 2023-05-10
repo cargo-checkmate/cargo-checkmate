@@ -1,6 +1,6 @@
 name: job-per-phase
 
-on: pull_request
+on: push
 
 jobs:
   setup:
