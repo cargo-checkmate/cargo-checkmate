@@ -13,11 +13,13 @@ jobs:
           toolchain: stable
           override: true
       - run: cargo install cargo-checkmate
+      - run: which cargo-checkmate
       - name: Upload checkmate binary
         uses: actions/upload-artifact@v3
         with:
           name: checkmate-binary
-          path: .cargo/bin/cargo-checkmate
+          path: '.cargo/bin/cargo-checkmate'
+          if-no-files-found: error
 
   check:
     needs: setup
