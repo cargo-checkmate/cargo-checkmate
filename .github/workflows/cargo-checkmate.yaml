@@ -1,18 +1,18 @@
-name: prototype cargo-checkmate action ci
+on: [push, pull_request]
 
-on: pull_request
+name: cargo-checkmate Continuous Integration (build-checkmate)
 
 jobs:
-  cargo-checkmate:
-    name: cargo-checkmate
+  cargo-checkmate-build-checkmate:
+    name: cargo-checkmate-build-checkmate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: cargo checkmate clippy
-        uses: cargo-checkmate/action@use-checkmate-ghcr-image
+      - uses: actions-rs/toolchain@v1
         with:
-          phase: clippy
-      - name: cargo checkmate build
-        uses: cargo-checkmate/action@use-checkmate-ghcr-image
-        with:
-          phase: build
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: cargo install cargo-checkmate
+      - run: cargo-checkmate clippy
+      - run: cargo-checkmate build
