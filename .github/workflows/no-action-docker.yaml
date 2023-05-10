@@ -13,38 +13,72 @@ jobs:
           toolchain: stable
           override: true
       - run: cargo install cargo-checkmate
+      - name: Upload checkmate binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkmate-binary
+          path: .cargo/bin/cargo-checkmate
+
   check:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate check
   format:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate format
   clippy:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate clippy
   build:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate build
   test:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate test
   doc:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate doc
   audit:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Download checkmate binary
+        uses: actions/download-artifact@v3
+        with:
+          name: checkmate-binary
       - run: cargo-checkmate audit
