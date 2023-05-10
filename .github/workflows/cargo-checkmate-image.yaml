@@ -1,4 +1,3 @@
-version: 2
 name: action-container
 
 on: pull_request

@@ -1,13 +1,9 @@
-version: 2
-name: docker-parallel-no-action
+name: job-per-phase
 
 on: pull_request
 
 jobs:
-  cargo-checkmate-no-action-parallel-docker:
-    name: cargo-checkmate-no-action-parallel-docker
-    docker:
-      - image: ghcr.io/cargo-checkmate/cargo-checkmate
+  setup:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -16,11 +12,31 @@ jobs:
           toolchain: stable
           override: true
       - run: cargo install cargo-checkmate
+  check:
+    needs: setup
+    steps:
       - run: cargo-checkmate check
+  format:
+    needs: setup
+    steps:
       - run: cargo-checkmate format
+  clippy:
+    needs: setup
+    steps:
       - run: cargo-checkmate clippy
+  build:
+    needs: setup
+    steps:
       - run: cargo-checkmate build
+  test:
+    needs: setup
+    steps:
       - run: cargo-checkmate test
+  doc:
+    needs: setup
+    steps:
       - run: cargo-checkmate doc
+  audit:
+    needs: setup
+    steps:
       - run: cargo-checkmate audit
-
