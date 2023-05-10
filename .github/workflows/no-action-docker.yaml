@@ -1,4 +1,5 @@
-name: cargo-checkmate Continuous Integration (no-action parallel docker)
+version: 2
+name: docker-parallel-no-action
 
 on: pull_request
 

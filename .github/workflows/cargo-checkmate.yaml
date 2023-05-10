@@ -1,4 +1,5 @@
-name: cargo-checkmate Continuous Integration (build-checkmate)
+version: 2
+name: single-host-serial
 
 on: pull_request
 
