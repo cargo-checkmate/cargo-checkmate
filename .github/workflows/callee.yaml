@@ -3,14 +3,22 @@ name: cargo-checkmate phases
 on: [workflow_call]
 
 jobs:
+  cache-checkmate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: baptiste0928/cargo-install@v2
+        with:
+          crate: cargo-checkmate
+
   run-phase:
     strategy:
       matrix:
         phase: [audit, build, check, clippy, doc, format, test]
+    needs: cache-checkmate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - uses: baptiste0928/cargo-install@v2
         with:
           crate: cargo-checkmate
+      - uses: actions/checkout@v3
       - run: cargo-checkmate ${{ matrix.phase }}
