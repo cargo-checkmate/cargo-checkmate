@@ -9,93 +9,37 @@ on:
 
 jobs:
   audit:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate audit
+    uses: ./.github/workflows/callee-phase.yaml
+    with:
+      phase: audit
 
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate build
+    uses: ./.github/workflows/callee-phase.yaml
+    with:
+      phase: build
 
   check:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate check
+    uses: ./.github/workflows/callee-phase.yaml
+    with:
+      phase: check
 
   clippy:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate clippy
+    uses: ./.github/workflows/callee-phase.yaml
+    with:
+      phase: clippy
 
   doc:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate doc
+    uses: ./.github/workflows/callee-phase.yaml
+    with:
+      phase: doc
 
   format:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate format
+    uses: ./.github/workflows/callee-phase.yaml
+    with:
+      phase: format
 
   test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate test
+    uses: ./.github/workflows/callee-phase.yaml
+      with:
+      phase: test
 
