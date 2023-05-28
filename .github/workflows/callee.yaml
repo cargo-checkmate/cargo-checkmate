@@ -1,6 +1,6 @@
 name: cargo-checkmate phases
 
-on: workflow_call
+on: [workflow_call]
 
 jobs:
   checkmate-phases:
