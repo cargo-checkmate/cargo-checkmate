@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         phase: [audit, build, check, clippy, doc, format, test]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: baptiste0928/cargo-install@v2
