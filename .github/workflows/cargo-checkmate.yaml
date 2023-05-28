@@ -7,5 +7,3 @@ on:
 jobs:
   phases:
     uses: ./.github/workflows/callee.yaml
-    with:
-      os-matrix: [ubuntu-latest, macos-latest]

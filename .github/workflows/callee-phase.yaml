@@ -9,16 +9,10 @@ on:
       checkmate-version:
         type: string
         default: "^0.1.14"
-      os-matrix:
-        type: array
-        default: [ubuntu-latest, windows-latest, macos-latest]
 
 jobs:
   run-phase:
-    strategy:
-      matrix:
-        os: ${{ inputs.os-matrix }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: baptiste0928/cargo-install@v2

@@ -6,50 +6,40 @@ on:
       checkmate-version:
         type: string
         default: "^0.1.14"
-      os-matrix:
-        type: array
-        default: [ubuntu-latest, windows-latest, macos-latest]
 
 jobs:
   audit:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: audit
-      os-matrix: ${{ inputs.os-matrix }}
 
   build:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: build
-      os-matrix: ${{ inputs.os-matrix }}
 
   check:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: check
-      os-matrix: ${{ inputs.os-matrix }}
 
   clippy:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: clippy
-      os-matrix: ${{ inputs.os-matrix }}
 
   doc:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: doc
-      os-matrix: ${{ inputs.os-matrix }}
 
   format:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: format
-      os-matrix: ${{ inputs.os-matrix }}
 
   test:
     uses: ./.github/workflows/callee-phase.yaml
     with:
       phase: test
-      os-matrix: ${{ inputs.os-matrix }}
 
