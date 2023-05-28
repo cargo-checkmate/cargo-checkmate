@@ -1,11 +1,6 @@
 name: cargo-checkmate phases
 
-on:
-  workflow_call:
-    inputs:
-      checkmate-version:
-        type: string
-        default: "^0.1.14"
+on: workflow_call
 
 jobs:
   checkmate-phases:
@@ -17,5 +12,4 @@ jobs:
       - uses: baptiste0928/cargo-install@v2
         with:
           crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
       - run: cargo-checkmate ${{ matrix.phase }}
