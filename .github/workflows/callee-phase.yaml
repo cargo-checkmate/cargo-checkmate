@@ -9,12 +9,15 @@ on:
       checkmate-version:
         type: string
         default: "^0.1.14"
+      os-matrix:
+        type: array
+        default: [ubuntu-latest, windows-latest, macos-latest]
 
 jobs:
   run-phase:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: ${{ input.os-matrix }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
