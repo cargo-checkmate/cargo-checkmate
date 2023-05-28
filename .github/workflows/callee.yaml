@@ -8,38 +8,14 @@ on:
         default: "^0.1.14"
 
 jobs:
-  audit:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: audit
-
-  build:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: build
-
-  check:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: check
-
-  clippy:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: clippy
-
-  doc:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: doc
-
-  format:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: format
-
-  test:
-    uses: ./.github/workflows/callee-phase.yaml
-    with:
-      phase: test
-
+  checkmate-phases:
+    strategy:
+      matrix:
+        phase: [audit, build, check, clippy, doc, format, test]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: baptiste0928/cargo-install@v2
+        with:
+          crate: cargo-checkmate
+          version: ${{ inputs.checkmate-version }}
+      - run: cargo-checkmate ${{ matrix.phase }}
