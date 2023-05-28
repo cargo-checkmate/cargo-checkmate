@@ -3,7 +3,7 @@ name: cargo-checkmate phases
 on: [workflow_call]
 
 jobs:
-  checkmate-phases:
+  run-phase:
     strategy:
       matrix:
         phase: [audit, build, check, clippy, doc, format, test]
