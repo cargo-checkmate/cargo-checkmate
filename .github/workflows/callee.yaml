@@ -6,9 +6,9 @@ jobs:
   cache-checkmate:
     runs-on: ubuntu-latest
     steps:
-      - uses: baptiste0928/cargo-install@v2
+      - uses: taiki-e/cache-cargo-install-action@v1
         with:
-          crate: cargo-checkmate
+          tool: cargo-checkmate
 
   run-phase:
     strategy:
@@ -17,8 +17,8 @@ jobs:
     needs: cache-checkmate
     runs-on: ubuntu-latest
     steps:
-      - uses: baptiste0928/cargo-install@v2
+      - uses: taiki-e/cache-cargo-install-action@v1
         with:
-          crate: cargo-checkmate
+          tool: cargo-checkmate
       - uses: actions/checkout@v3
       - run: cargo-checkmate ${{ matrix.phase }}
