@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 pub fn run(args: &[&str]) -> anyhow::Result<String> {
     use anyhow::Context;
     use anyhow_std::CommandAnyhow;
@@ -29,4 +31,13 @@ pub fn run(args: &[&str]) -> anyhow::Result<String> {
             }
         ))
     }
+}
+
+pub fn get_dir() -> anyhow::Result<PathBuf> {
+    let s = run(&["rev-parse", "--git-dir"])?;
+    Ok(PathBuf::from(s.trim_end()))
+}
+
+pub fn get_hook_path(hookname: &str) -> anyhow::Result<PathBuf> {
+    Ok(get_dir()?.join("hooks").join(hookname))
 }

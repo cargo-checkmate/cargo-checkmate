@@ -4,6 +4,7 @@
 mod cdcrate;
 mod executable;
 mod git;
+mod githook;
 mod hook;
 mod options;
 mod phase;

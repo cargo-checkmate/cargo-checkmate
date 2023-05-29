@@ -1,4 +1,5 @@
 use crate::executable::Executable;
+use crate::githook::GitHook;
 use crate::hook::Hook;
 use crate::phase::Phase;
 use crate::readme::Readme;
@@ -24,6 +25,8 @@ pub enum Subcommand {
 
     #[clap(subcommand)]
     Hook(Hook),
+    #[clap(subcommand)]
+    GitHook(GitHook),
     Readme(Readme),
 }
 
@@ -65,6 +68,7 @@ impl Executable for Subcommand {
             Subcommand::Everything => Phase::execute_everything(),
             Subcommand::Phase(x) => x.execute(),
             Subcommand::Hook(x) => x.execute(),
+            Subcommand::GitHook(x) => x.execute(),
             Subcommand::Readme(x) => x.execute(),
         }
     }
