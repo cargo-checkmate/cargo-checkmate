@@ -1,6 +1,6 @@
 use crate::executable::Executable;
 use anyhow_std::PathAnyhow;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 const CONTENTS: &str = include_str!("githook/pre-commit.sh");
 
@@ -36,7 +36,9 @@ impl Executable for GitHook {
 pub fn install() -> anyhow::Result<()> {
     let p = get_path()?;
     println!("Installing: {:?}", p.display());
-    p.write_anyhow(CONTENTS)
+    p.write_anyhow(CONTENTS)?;
+    make_executable(&p)?;
+    Ok(())
 }
 
 pub fn uninstall() -> anyhow::Result<()> {
@@ -66,4 +68,16 @@ pub fn print_contents() -> anyhow::Result<()> {
 
 pub fn get_path() -> anyhow::Result<PathBuf> {
     crate::git::get_hook_path("pre-commit")
+}
+
+// TODO: implement for other platforms:
+fn make_executable(p: &Path) -> anyhow::Result<()> {
+    use anyhow::Context;
+    use std::os::unix::fs::PermissionsExt;
+
+    let mut perms = p.metadata_anyhow()?.permissions();
+    // Set user read/execute perms on unix:
+    perms.set_mode(perms.mode() | 0o500);
+    std::fs::set_permissions(p, perms).with_context(|| format!("-for path {:?}", p.display()))?;
+    Ok(())
 }
