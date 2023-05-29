@@ -1,80 +1,24 @@
 name: cargo-checkmate phases
 
-on:
-  workflow_call:
-    inputs:
-      checkmate-version:
-        type: string
-        default: "^0.1.14"
+on: [workflow_call]
 
 jobs:
-  audit:
+  cache-checkmate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
+      - uses: taiki-e/cache-cargo-install-action@v1
         with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate audit
+          tool: cargo-checkmate
 
-  build:
+  run-phase:
+    strategy:
+      matrix:
+        phase: [audit, build, check, clippy, doc, format, test]
+    needs: cache-checkmate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
+      - uses: taiki-e/cache-cargo-install-action@v1
         with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate build
-
-  check:
-    runs-on: ubuntu-latest
-    steps:
+          tool: cargo-checkmate
       - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate check
-
-  clippy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate clippy
-
-  doc:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate doc
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate format
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: cargo-checkmate
-          version: ${{ inputs.checkmate-version }}
-      - run: cargo-checkmate test
-
+      - run: cargo-checkmate ${{ matrix.phase }}
