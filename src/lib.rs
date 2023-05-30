@@ -3,6 +3,7 @@
 
 mod cdcrate;
 mod executable;
+mod gh;
 mod git;
 mod githook;
 mod hook;
