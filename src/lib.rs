@@ -6,14 +6,12 @@ mod executable;
 mod gh;
 mod git;
 mod githook;
-mod hook;
 mod options;
 mod phase;
 mod readme;
 mod resultsdir;
 mod run;
 mod runner;
-mod srcbundle;
 mod subcommands;
 
 pub use self::run::run;

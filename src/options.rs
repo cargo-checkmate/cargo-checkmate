@@ -1,7 +1,6 @@
 use crate::executable::Executable;
 use crate::gh::Gh;
 use crate::githook::GitHook;
-use crate::hook::Hook;
 use crate::phase::Phase;
 use crate::readme::Readme;
 
@@ -24,8 +23,6 @@ pub enum Subcommand {
     #[clap(flatten)]
     Phase(Phase),
 
-    #[clap(subcommand)]
-    Hook(Hook),
     #[clap(subcommand)]
     GitHook(GitHook),
     #[clap(subcommand)]
@@ -70,7 +67,6 @@ impl Executable for Subcommand {
         match self {
             Subcommand::Everything => Phase::execute_everything(),
             Subcommand::Phase(x) => x.execute(),
-            Subcommand::Hook(x) => x.execute(),
             Subcommand::GitHook(x) => x.execute(),
             Subcommand::Gh(x) => x.execute(),
             Subcommand::Readme(x) => x.execute(),
