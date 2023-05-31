@@ -64,8 +64,7 @@ impl Executable for Options {
 impl Executable for Subcommand {
     fn execute(&self) -> anyhow::Result<()> {
         match self {
-            Subcommand::Run { phase: None } => Phase::execute_everything(),
-            Subcommand::Run { phase: Some(x) } => x.execute(),
+            Subcommand::Run { phase: x } => x.execute(),
             Subcommand::GitHook(x) => x.execute(),
             Subcommand::Gh(x) => x.execute(),
             Subcommand::Readme(x) => x.execute(),

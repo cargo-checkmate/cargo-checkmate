@@ -53,6 +53,16 @@ impl Phase {
     }
 }
 
+impl Executable for Option<Phase> {
+    fn execute(&self) -> anyhow::Result<()> {
+        if let Some(phase) = self {
+            phase.execute()
+        } else {
+            Phase::execute_everything()
+        }
+    }
+}
+
 impl Executable for Phase {
     fn execute(&self) -> anyhow::Result<()> {
         use crate::subcommands::{audit, cargo_builtin};
