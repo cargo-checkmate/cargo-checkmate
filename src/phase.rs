@@ -37,7 +37,7 @@ impl Phase {
         println!(
             "\nrunning {} {} validation",
             everything.len(),
-            crate::CMDNAME
+            env!("CARGO_PKG_NAME")
         );
 
         for phase in everything {
@@ -61,6 +61,14 @@ impl Phase {
             Audit(AuditOptions { force: false }),
         ]
         .into_iter()
+    }
+
+    /// The maximum phase name in characters
+    pub fn max_phase_name_length() -> usize {
+        Phase::list()
+            .map(|p| p.to_string().chars().count())
+            .max()
+            .unwrap()
     }
 }
 

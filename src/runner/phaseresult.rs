@@ -26,7 +26,7 @@ impl PhaseResult {
 
         let mut empty = true;
 
-        println!("---- {} {} ----", crate::CMDNAME, self.name);
+        println!("---- {} {} ----", env!("CARGO_PKG_NAME"), self.name);
         for rellogpath in &[self.outlog, self.errlog] {
             if rellogpath.metadata()?.len() > 0 {
                 empty = false;
