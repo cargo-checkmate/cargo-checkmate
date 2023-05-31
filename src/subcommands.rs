@@ -55,6 +55,7 @@ fn audit_if_necessary() -> anyhow::Result<()> {
     if expired || stale {
         let exe = std::env::current_exe()?;
         let status = Command::new(exe)
+            .arg("run")
             .arg("audit")
             .arg("--force")
             .status_anyhow()?;

@@ -39,14 +39,17 @@ impl Runner {
         let phasename = &phase.to_string();
         let exec = std::env::current_exe()?;
 
-        print!("{} {}... ", CMDNAME, phasename);
+        print!("{} run {}... ", CMDNAME, phasename);
 
         {
             use std::io::Write;
             std::io::stdout().flush()?;
         }
 
-        let output = Command::new(exec).arg(phasename).output_anyhow()?;
+        let output = Command::new(exec)
+            .arg("run")
+            .arg(phasename)
+            .output_anyhow()?;
 
         let reloutlog = self.rellog_path(phasename, "stdout");
         let relerrlog = self.rellog_path(phasename, "stderr");
