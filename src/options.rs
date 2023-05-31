@@ -3,8 +3,9 @@ use crate::gh::Gh;
 use crate::githook::GitHook;
 use crate::phase::Phase;
 use crate::readme::Readme;
+use std::ffi::OsString;
 
-#[derive(Debug, clap::Parser)]
+#[derive(Debug, PartialEq, Eq, clap::Parser)]
 #[clap(
     setting = clap::AppSettings::NoBinaryName,
     about = env!("CARGO_PKG_DESCRIPTION"),
@@ -15,7 +16,7 @@ pub struct Options {
     cmd: Option<Subcommand>,
 }
 
-#[derive(Debug, clap::Parser)]
+#[derive(Debug, PartialEq, Eq, clap::Parser)]
 pub enum Subcommand {
     /// Run all phases.
     Everything,
@@ -31,14 +32,25 @@ pub enum Subcommand {
 }
 
 impl Options {
-    pub fn parse_args() -> Options {
-        let mut it = std::env::args().peekable();
+    pub fn parse_std_args() -> Options {
+        match Self::try_parse_args(std::env::args()) {
+            Ok(opts) => opts,
+            Err(e) => e.exit(),
+        }
+    }
+
+    pub fn try_parse_args<I, T>(it: I) -> clap::error::Result<Options>
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<OsString> + Clone,
+    {
+        let mut it = it.into_iter().map(|s| s.into()).peekable();
 
         // Skip the binary name:
         it.next();
 
         // If executed as `cargo checkmate`, the first arg is "checkmate":
-        if it.peek().map(|s| s.as_str()) == Some("checkmate") {
+        if it.peek().and_then(|s| s.to_str()) == Some("checkmate") {
             // This will trip up clap parsing, so skip it:
             it.next();
         }
@@ -46,11 +58,11 @@ impl Options {
         {
             use clap::Parser;
 
-            Self::from_clap(
-                &Self::clap()
-                    .bin_name("cargo-checkmate")
-                    .get_matches_from(it),
-            )
+            let matches = &Self::clap()
+                .bin_name("cargo-checkmate")
+                .try_get_matches_from(it)?;
+
+            Ok(Self::from_clap(matches))
         }
     }
 }
@@ -73,3 +85,6 @@ impl Executable for Subcommand {
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

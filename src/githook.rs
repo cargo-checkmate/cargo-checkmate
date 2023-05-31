@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 const CONTENTS: &str = include_str!("githook/pre-commit.sh");
 
 /// git hook
-#[derive(Debug, clap::Subcommand)]
+#[derive(Debug, PartialEq, Eq, clap::Subcommand)]
 pub enum GitHook {
     /// install git hook, overwriting if present
     Install,
