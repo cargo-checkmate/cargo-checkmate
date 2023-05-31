@@ -7,7 +7,8 @@ use std::ffi::OsString;
 
 #[derive(Debug, PartialEq, Eq, clap::Parser)]
 #[clap(
-    setting = clap::AppSettings::NoBinaryName,
+    // Accommodate execution as either `cargo-checkmate …` or `cargo checkmate …`
+    no_binary_name = true,
     about = env!("CARGO_PKG_DESCRIPTION"),
     version,
 )]
@@ -44,26 +45,11 @@ impl Options {
         I: IntoIterator<Item = T>,
         T: Into<OsString> + Clone,
     {
-        let mut it = it.into_iter().map(|s| s.into()).peekable();
+        use clap::Parser;
 
-        // Skip the binary name:
-        it.next();
-
-        // If executed as `cargo checkmate`, the first arg is "checkmate":
-        if it.peek().and_then(|s| s.to_str()) == Some("checkmate") {
-            // This will trip up clap parsing, so skip it:
-            it.next();
-        }
-
-        {
-            use clap::Parser;
-
-            let matches = &Self::clap()
-                .bin_name("cargo-checkmate")
-                .try_get_matches_from(it)?;
-
-            Ok(Self::from_clap(matches))
-        }
+        let mut it = it.into_iter().map(|s| s.into());
+        skip_binary_names(&mut it)?;
+        Self::try_parse_from(it)
     }
 }
 
@@ -84,6 +70,52 @@ impl Executable for Subcommand {
             Subcommand::Readme(x) => x.execute(),
         }
     }
+}
+
+fn skip_binary_names<I>(args: &mut I) -> clap::error::Result<()>
+where
+    I: Iterator<Item = OsString>,
+{
+    let bin = expect_arg(&["cargo", "cargo-checkmate"], args)?;
+
+    if bin == "cargo" {
+        expect_arg(&["checkmate"], args)?;
+    }
+    Ok(())
+}
+
+fn expect_arg<I>(expecting: &[&str], args: &mut I) -> clap::error::Result<OsString>
+where
+    I: Iterator<Item = OsString>,
+{
+    use clap::error::Error;
+    use clap::error::ErrorKind::{InvalidSubcommand, MissingSubcommand};
+    use std::path::Path;
+
+    let arg = args.next().ok_or_else(|| {
+        Error::raw(
+            MissingSubcommand,
+            format!("expecting one of {expecting:?}; found nothing"),
+        )
+    })?;
+
+    let file_name = Path::new(arg.as_os_str()).file_name().ok_or_else(|| {
+        Error::raw(
+            InvalidSubcommand,
+            format!("expecting one of {expecting:?}; found {arg:?}"),
+        )
+    })?;
+
+    for expected in expecting {
+        if file_name == *expected {
+            return Ok(file_name.to_os_string());
+        }
+    }
+
+    Err(Error::raw(
+        InvalidSubcommand,
+        format!("expecting one of {expecting:?}; found {arg:?}"),
+    ))
 }
 
 #[cfg(test)]
