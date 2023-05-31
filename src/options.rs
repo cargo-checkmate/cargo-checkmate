@@ -21,17 +21,22 @@ pub struct Options {
 pub enum Subcommand {
     /// Run validations
     ///
-    /// If no validation is provided, all are run.
+    /// If no validation is provided, all are run in the order shown by the `list` subcommand.
     Run {
         #[clap(subcommand)]
         phase: Option<Phase>,
     },
+    List(List),
     #[clap(subcommand)]
     GitHook(GitHook),
     #[clap(subcommand)]
     Gh(Gh),
     Readme(Readme),
 }
+
+/// List the validation steps in order
+#[derive(Debug, PartialEq, Eq, clap::Parser)]
+pub struct List {}
 
 impl Options {
     pub fn parse_std_args() -> Options {
@@ -65,10 +70,20 @@ impl Executable for Subcommand {
     fn execute(&self) -> anyhow::Result<()> {
         match self {
             Subcommand::Run { phase: x } => x.execute(),
+            Subcommand::List(x) => x.execute(),
             Subcommand::GitHook(x) => x.execute(),
             Subcommand::Gh(x) => x.execute(),
             Subcommand::Readme(x) => x.execute(),
         }
+    }
+}
+
+impl Executable for List {
+    fn execute(&self) -> anyhow::Result<()> {
+        for phase in Phase::list() {
+            println!("{phase}");
+        }
+        Ok(())
     }
 }
 

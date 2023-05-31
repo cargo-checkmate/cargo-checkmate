@@ -29,9 +29,29 @@ pub struct AuditOptions {
 impl Phase {
     pub fn execute_everything() -> anyhow::Result<()> {
         use crate::runner::Runner;
+
+        let everything: Vec<Phase> = Phase::list().collect();
+
+        let mut runner = Runner::new()?;
+
+        println!(
+            "\nrunning {} {} validation",
+            everything.len(),
+            crate::CMDNAME
+        );
+
+        for phase in everything {
+            runner.run_phase(&phase)?;
+        }
+
+        runner.exit()
+    }
+
+    /// List the validation phases executed by [Phase::execute_everything] in order
+    pub fn list() -> impl Iterator<Item = Phase> {
         use Phase::*;
 
-        let everything = &[
+        [
             Check,
             Format,
             Clippy,
@@ -39,17 +59,8 @@ impl Phase {
             Test,
             Doc,
             Audit(AuditOptions { force: false }),
-        ];
-
-        let mut runner = Runner::new()?;
-
-        println!("\nrunning {} {} phases", everything.len(), crate::CMDNAME);
-
-        for phase in everything {
-            runner.run_phase(phase)?;
-        }
-
-        runner.exit()
+        ]
+        .into_iter()
     }
 }
 
