@@ -2,7 +2,7 @@ use crate::executable::Executable;
 
 const README: &str = include_str!("../README.md");
 
-#[derive(Debug, clap::Parser)]
+#[derive(Debug, PartialEq, Eq, clap::Parser)]
 /// Display the project README.md
 pub struct Readme {}
 

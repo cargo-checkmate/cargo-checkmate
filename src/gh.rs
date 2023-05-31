@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 const CONTENTS: &str = include_str!("gh/cargo-checkmate.yaml");
 
 /// github integration
-#[derive(Debug, clap::Subcommand)]
+#[derive(Debug, PartialEq, Eq, clap::Subcommand)]
 pub enum Gh {
     /// install github CI workflow, overwriting if present
     Install,

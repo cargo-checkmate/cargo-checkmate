@@ -4,6 +4,6 @@ pub fn run() -> anyhow::Result<()> {
     use crate::options::Options;
 
     crate::cdcrate::change_directory_to_crate_root()?;
-    let opts = Options::parse_args();
+    let opts = Options::parse_std_args();
     opts.execute()
 }

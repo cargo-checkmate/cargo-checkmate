@@ -3,10 +3,12 @@ use crate::gh::Gh;
 use crate::githook::GitHook;
 use crate::phase::Phase;
 use crate::readme::Readme;
+use std::ffi::OsString;
 
-#[derive(Debug, clap::Parser)]
+#[derive(Debug, PartialEq, Eq, clap::Parser)]
 #[clap(
-    setting = clap::AppSettings::NoBinaryName,
+    // Accommodate execution as either `cargo-checkmate …` or `cargo checkmate …`
+    no_binary_name = true,
     about = env!("CARGO_PKG_DESCRIPTION"),
     version,
 )]
@@ -15,7 +17,7 @@ pub struct Options {
     cmd: Option<Subcommand>,
 }
 
-#[derive(Debug, clap::Parser)]
+#[derive(Debug, PartialEq, Eq, clap::Parser)]
 pub enum Subcommand {
     /// Run all phases.
     Everything,
@@ -31,27 +33,23 @@ pub enum Subcommand {
 }
 
 impl Options {
-    pub fn parse_args() -> Options {
-        let mut it = std::env::args().peekable();
-
-        // Skip the binary name:
-        it.next();
-
-        // If executed as `cargo checkmate`, the first arg is "checkmate":
-        if it.peek().map(|s| s.as_str()) == Some("checkmate") {
-            // This will trip up clap parsing, so skip it:
-            it.next();
+    pub fn parse_std_args() -> Options {
+        match Self::try_parse_args(std::env::args()) {
+            Ok(opts) => opts,
+            Err(e) => e.exit(),
         }
+    }
 
-        {
-            use clap::Parser;
+    pub fn try_parse_args<I, T>(it: I) -> clap::error::Result<Options>
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<OsString> + Clone,
+    {
+        use clap::Parser;
 
-            Self::from_clap(
-                &Self::clap()
-                    .bin_name("cargo-checkmate")
-                    .get_matches_from(it),
-            )
-        }
+        let mut it = it.into_iter().map(|s| s.into());
+        skip_binary_names(&mut it)?;
+        Self::try_parse_from(it)
     }
 }
 
@@ -73,3 +71,52 @@ impl Executable for Subcommand {
         }
     }
 }
+
+fn skip_binary_names<I>(args: &mut I) -> clap::error::Result<()>
+where
+    I: Iterator<Item = OsString>,
+{
+    let bin = expect_arg(&["cargo", "cargo-checkmate"], args)?;
+
+    if bin == "cargo" {
+        expect_arg(&["checkmate"], args)?;
+    }
+    Ok(())
+}
+
+fn expect_arg<I>(expecting: &[&str], args: &mut I) -> clap::error::Result<OsString>
+where
+    I: Iterator<Item = OsString>,
+{
+    use clap::error::Error;
+    use clap::error::ErrorKind::{InvalidSubcommand, MissingSubcommand};
+    use std::path::Path;
+
+    let arg = args.next().ok_or_else(|| {
+        Error::raw(
+            MissingSubcommand,
+            format!("expecting one of {expecting:?}; found nothing"),
+        )
+    })?;
+
+    let file_name = Path::new(arg.as_os_str()).file_name().ok_or_else(|| {
+        Error::raw(
+            InvalidSubcommand,
+            format!("expecting one of {expecting:?}; found {arg:?}"),
+        )
+    })?;
+
+    for expected in expecting {
+        if file_name == *expected {
+            return Ok(file_name.to_os_string());
+        }
+    }
+
+    Err(Error::raw(
+        InvalidSubcommand,
+        format!("expecting one of {expecting:?}; found {arg:?}"),
+    ))
+}
+
+#[cfg(test)]
+mod tests;
