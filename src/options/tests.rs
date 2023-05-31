@@ -1,36 +1,47 @@
-use super::{Options, Subcommand::Phase};
+use super::{Options, Subcommand::Run};
 use crate::phase::Phase::Clippy;
 use test_case::test_case;
 
+const RUN_CLIPPY: Options = Options {
+    cmd: Some(Run {
+        phase: Some(Clippy),
+    }),
+};
+
 #[test_case(
     &["cargo-checkmate"]
-    => Ok(Options { cmd: None})
+    => Ok(Options { cmd: None })
     ; "checkmate-exec-no-args"
 )]
 #[test_case(
     &["cargo", "checkmate"]
-    => Ok(Options { cmd: None})
+    => Ok(Options { cmd: None })
     ; "cargo-checkmate-no-args"
 )]
 #[test_case(
-    &["cargo-checkmate", "clippy"]
-    => Ok(Options { cmd: Some(Phase(Clippy))})
+    &["cargo", "checkmate", "run"]
+    => Ok(Options { cmd: Some(Run { phase: None })})
+    ; "cargo-checkmate-run"
+)]
+#[test_case(
+    &["cargo-checkmate", "run", "clippy"]
+    => Ok(RUN_CLIPPY)
     ; "checkmate-clippy"
 )]
 #[test_case(
-    &["cargo", "checkmate", "clippy"]
-    => Ok(Options { cmd: Some(Phase(Clippy))})
+    &["cargo", "checkmate", "run", "clippy"]
+    => Ok(RUN_CLIPPY)
     ; "cargo-checkmate-clippy"
 )]
 #[test_case(
-    &["/path/to/cargo", "checkmate", "clippy"]
-    => Ok(Options { cmd: Some(Phase(Clippy))})
+    &["/path/to/cargo", "checkmate", "run", "clippy"]
+    => Ok(RUN_CLIPPY)
     ; "cargopath-checkmate-clippy"
 )]
 // This case should not occur in the wild, but will still parse:
 #[test_case(
-    &["cargo", "../foo/weird/checkmate", "clippy"]
-    => Ok(Options { cmd: Some(Phase(Clippy))})
+    &["cargo", "../foo/weird/checkmate", "run", "clippy"]
+    => Ok(RUN_CLIPPY)
     ; "cargo-checkmateweirdpath-clippy"
 )]
 #[test_case(

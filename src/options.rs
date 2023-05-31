@@ -19,12 +19,13 @@ pub struct Options {
 
 #[derive(Debug, PartialEq, Eq, clap::Parser)]
 pub enum Subcommand {
-    /// Run all phases.
-    Everything,
-
-    #[clap(flatten)]
-    Phase(Phase),
-
+    /// Run validations
+    ///
+    /// If no validation is provided, all are run.
+    Run {
+        #[clap(subcommand)]
+        phase: Option<Phase>,
+    },
     #[clap(subcommand)]
     GitHook(GitHook),
     #[clap(subcommand)]
@@ -55,7 +56,7 @@ impl Options {
 
 impl Executable for Options {
     fn execute(&self) -> anyhow::Result<()> {
-        let default = Subcommand::Everything;
+        let default = Subcommand::Run { phase: None };
         self.cmd.as_ref().unwrap_or(&default).execute()
     }
 }
@@ -63,8 +64,8 @@ impl Executable for Options {
 impl Executable for Subcommand {
     fn execute(&self) -> anyhow::Result<()> {
         match self {
-            Subcommand::Everything => Phase::execute_everything(),
-            Subcommand::Phase(x) => x.execute(),
+            Subcommand::Run { phase: None } => Phase::execute_everything(),
+            Subcommand::Run { phase: Some(x) } => x.execute(),
             Subcommand::GitHook(x) => x.execute(),
             Subcommand::Gh(x) => x.execute(),
             Subcommand::Readme(x) => x.execute(),

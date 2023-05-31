@@ -4,25 +4,19 @@ use std::fmt;
 
 #[derive(Debug, PartialEq, Eq, clap::Parser)]
 pub enum Phase {
-    /// phase: `cargo check` syntax + type checking.
+    /// `cargo check` syntax + type checking.
     Check,
-
-    /// phase: Use `cargo fmt` to check if code is correctly formatted.
+    /// Use `cargo fmt` to check if code is correctly formatted.
     Format,
-
-    /// phase: `cargo build` the default target.
+    /// `cargo build` the default target.
     Build,
-
-    /// phase: `cargo test` automated unit tests.
+    /// `cargo test` automated unit tests.
     Test,
-
-    /// phase: `cargo doc` generation.
+    /// `cargo doc` generation.
     Doc,
-
-    /// phase: `cargo clippy` lint checks.
+    /// `cargo clippy` lint checks.
     Clippy,
-
-    /// phase: `cargo audit` security advisories across all dependencies.
+    /// `cargo audit` security advisories across all dependencies.
     Audit(AuditOptions),
 }
 

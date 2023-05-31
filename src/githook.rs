@@ -48,12 +48,12 @@ pub fn uninstall() -> anyhow::Result<()> {
 }
 
 pub fn run() -> anyhow::Result<()> {
-    use crate::options::Subcommand::Everything;
+    use crate::phase::Phase;
 
     println!("cargo checkmate git-hook:");
 
     // TODO: Ensure the repo is clean first.
-    Everything.execute()
+    Phase::execute_everything()
 }
 
 pub fn print_path() -> anyhow::Result<()> {
