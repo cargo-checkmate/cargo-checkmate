@@ -16,5 +16,3 @@ mod subcommands;
 
 pub use self::run::run;
 pub use resultsdir::results_dir;
-
-const CMDNAME: &str = env!("CARGO_PKG_NAME");

@@ -37,7 +37,7 @@ impl Phase {
         println!(
             "\nrunning {} {} validation",
             everything.len(),
-            crate::CMDNAME
+            env!("CARGO_PKG_NAME")
         );
 
         for phase in everything {

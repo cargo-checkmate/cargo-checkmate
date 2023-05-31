@@ -1,5 +1,4 @@
 use crate::phase::Phase;
-use crate::CMDNAME;
 use anyhow::Result;
 use std::path::PathBuf;
 
@@ -39,7 +38,7 @@ impl Runner {
         let phasename = &phase.to_string();
         let exec = std::env::current_exe()?;
 
-        print!("{} run {}... ", CMDNAME, phasename);
+        print!("{} run {}... ", env!("CARGO_PKG_NAME"), phasename);
 
         {
             use std::io::Write;
@@ -97,7 +96,10 @@ impl Runner {
 
         println!(
             "\n{} result: {}. {} passed; {} failed",
-            CMDNAME, label, passcount, failcount,
+            env!("CARGO_PKG_NAME"),
+            label,
+            passcount,
+            failcount,
         );
 
         std::process::exit(exitstatus);
