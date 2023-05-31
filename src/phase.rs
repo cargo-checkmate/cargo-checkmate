@@ -62,6 +62,14 @@ impl Phase {
         ]
         .into_iter()
     }
+
+    /// The maximum phase name in characters
+    pub fn max_phase_name_length() -> usize {
+        Phase::list()
+            .map(|p| p.to_string().chars().count())
+            .max()
+            .unwrap()
+    }
 }
 
 impl Executable for Option<Phase> {
