@@ -1,10 +1,11 @@
+mod phaseresult;
+
+use self::phaseresult::PhaseResult;
 use crate::phase::Phase;
 use anyhow::Result;
-use std::path::PathBuf;
-
-mod phaseresult;
+use anyhow_std::PathAnyhow;
 use colored::Colorize;
-use phaseresult::PhaseResult;
+use std::path::PathBuf;
 
 pub struct Runner {
     logdir: PathBuf,
@@ -16,13 +17,11 @@ impl Runner {
     pub fn new() -> Result<Runner> {
         let logdir = crate::results_dir().join("logs");
 
-        {
-            if logdir.exists() {
-                println!("Removing prior log directory: {}", &logdir.display());
-                std::fs::remove_dir_all(&logdir)?;
-            }
-            std::fs::create_dir_all(&logdir)?;
+        if logdir.exists() {
+            println!("Removing prior log directory: {}", &logdir.display());
+            logdir.remove_dir_all_anyhow()?;
         }
+        logdir.create_dir_all_anyhow()?;
 
         Ok(Runner {
             logdir,
