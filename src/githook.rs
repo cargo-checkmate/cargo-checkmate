@@ -1,4 +1,5 @@
 use crate::executable::Executable;
+use crate::git;
 use anyhow_std::PathAnyhow;
 use std::path::{Path, PathBuf};
 
@@ -51,8 +52,7 @@ pub fn run() -> anyhow::Result<()> {
     use crate::phase::Phase;
 
     println!("cargo checkmate git-hook:");
-
-    // TODO: Ensure the repo is clean first.
+    check_dirty()?;
     Phase::execute_everything()
 }
 
@@ -67,21 +67,45 @@ pub fn print_contents() -> anyhow::Result<()> {
 }
 
 pub fn get_path() -> anyhow::Result<PathBuf> {
-    crate::git::get_hook_path("pre-commit")
+    git::get_hook_path("pre-commit")
 }
 
-#[cfg(unix)]
+// TODO: implement for other platforms:
 fn make_executable(p: &Path) -> anyhow::Result<()> {
+    use anyhow::Context;
     use std::os::unix::fs::PermissionsExt;
 
     let mut perms = p.metadata_anyhow()?.permissions();
     // Set user read/execute perms on unix:
     perms.set_mode(perms.mode() | 0o500);
-    p.set_permissions_anyhow(perms)?;
+    std::fs::set_permissions(p, perms).with_context(|| format!("-for path {:?}", p.display()))?;
     Ok(())
 }
 
-#[cfg(not(unix))]
-fn make_executable(p: &Path) -> anyhow::Result<()> {
-    todo!("make_executable({p:?}) not implemented for this platform")
+fn check_dirty() -> anyhow::Result<()> {
+    use indoc::indoc;
+
+    let output = git::run(&["status", "--porcelain"])?;
+    let mut dirty = vec![];
+    for line in output.lines() {
+        if line.chars().nth(1) != Some(' ') {
+            dirty.push(line);
+        }
+    }
+    if dirty.is_empty() {
+        Ok(())
+    } else {
+        println!();
+        println!("These changes are not staged in git:");
+        for line in dirty {
+            println!("  {}", line.get(3..).unwrap());
+        }
+        println!();
+        println!(indoc! { "
+            The checkmate tool validates the current filesystem, but something different is staged for git commit. Since checkmate cannot validate the commit contents, this git hook is aborting.
+
+            To save unstaged changes for after a commit, see `git stash`.
+        "});
+        Err(anyhow::anyhow!("mixed git commit"))
+    }
 }
