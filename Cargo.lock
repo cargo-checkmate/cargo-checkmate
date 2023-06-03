@@ -122,9 +122,9 @@ checksum = "9c7d0618f0e0b7e8ff11427422b64564d5fb0be1940354bfe2e0529b18a9d9b8"
 
 [[package]]
 name = "anyhow-std"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "371af0f4200b11811edaa039fc8d12b7dcc41905129af16511f6518c1f24bc0d"
+checksum = "96300d1be6730904cd40cbc191155459af2815b238a325cdb75b543cb42ab840"
 dependencies = [
  "anyhow",
  "derive_more",

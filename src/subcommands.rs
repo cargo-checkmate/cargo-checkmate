@@ -1,4 +1,4 @@
-use anyhow_std::CommandAnyhow;
+use anyhow_std::{CommandAnyhow, PathAnyhow};
 use std::path::Path;
 use std::process::Command;
 use std::time::{Duration, SystemTime};
@@ -33,9 +33,9 @@ fn force_audit() -> anyhow::Result<()> {
 fn audit_if_necessary() -> anyhow::Result<()> {
     let stamp = crate::results_dir().join("audit.timestamp");
     {
-        let stampdir = stamp.parent().unwrap();
+        let stampdir = stamp.parent_anyhow()?;
         if !stampdir.is_dir() {
-            std::fs::create_dir_all(stampdir)?;
+            stampdir.create_dir_all_anyhow()?;
         }
     }
 
@@ -62,7 +62,7 @@ fn audit_if_necessary() -> anyhow::Result<()> {
 
         if status.success() {
             // Touch the timestamp path:
-            std::fs::File::create(stamp)?;
+            stamp.create_file_anyhow()?;
         }
 
         status.exit();
@@ -74,8 +74,6 @@ fn audit_if_necessary() -> anyhow::Result<()> {
 }
 
 fn modified<P: AsRef<Path>>(p: P) -> anyhow::Result<SystemTime> {
-    use anyhow_std::PathAnyhow;
-
     let pref = p.as_ref();
     if pref.exists() {
         pref.metadata_anyhow()?.modified()

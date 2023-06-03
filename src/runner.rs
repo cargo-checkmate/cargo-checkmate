@@ -1,10 +1,11 @@
+mod phaseresult;
+
+use self::phaseresult::PhaseResult;
 use crate::phase::Phase;
 use anyhow::Result;
-use std::path::PathBuf;
-
-mod phaseresult;
+use anyhow_std::PathAnyhow;
 use colored::Colorize;
-use phaseresult::PhaseResult;
+use std::path::PathBuf;
 
 pub struct Runner {
     logdir: PathBuf,
@@ -16,13 +17,11 @@ impl Runner {
     pub fn new() -> Result<Runner> {
         let logdir = crate::results_dir().join("logs");
 
-        {
-            if logdir.exists() {
-                println!("Removing prior log directory: {}", &logdir.display());
-                std::fs::remove_dir_all(&logdir)?;
-            }
-            std::fs::create_dir_all(&logdir)?;
+        if logdir.exists() {
+            println!("Removing prior log directory: {}", &logdir.display());
+            logdir.remove_dir_all_anyhow()?;
         }
+        logdir.create_dir_all_anyhow()?;
 
         Ok(Runner {
             logdir,
@@ -56,16 +55,11 @@ impl Runner {
             .arg(phasename)
             .output_anyhow()?;
 
-        let reloutlog = self.rellog_path(phasename, "stdout");
         let relerrlog = self.rellog_path(phasename, "stderr");
+        let reloutlog = self.rellog_path(phasename, "stdout");
 
-        {
-            use std::fs::File;
-            use std::io::Write;
-
-            File::create(&relerrlog)?.write_all(&output.stderr)?;
-            File::create(&reloutlog)?.write_all(&output.stdout)?;
-        }
+        relerrlog.write_anyhow(&output.stderr)?;
+        reloutlog.write_anyhow(&output.stdout)?;
 
         let results = if output.status.success() {
             if output.stdout.starts_with(b"skipped:\n") {

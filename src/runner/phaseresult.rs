@@ -21,7 +21,7 @@ impl PhaseResult {
 
     pub fn display(self) -> Result<()> {
         use self::indenter::Indenter;
-        use std::fs::File;
+        use anyhow_std::PathAnyhow;
         use std::io::{copy, stdout};
 
         let mut empty = true;
@@ -31,7 +31,10 @@ impl PhaseResult {
             if rellogpath.metadata()?.len() > 0 {
                 empty = false;
                 println!("+ {}:", rellogpath.display());
-                copy(&mut File::open(rellogpath)?, &mut Indenter::from(stdout()))?;
+                copy(
+                    &mut rellogpath.open_file_anyhow()?,
+                    &mut Indenter::from(stdout()),
+                )?;
             }
         }
 
