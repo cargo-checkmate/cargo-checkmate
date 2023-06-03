@@ -62,7 +62,7 @@ fn audit_if_necessary() -> anyhow::Result<()> {
 
         if status.success() {
             // Touch the timestamp path:
-            std::fs::File::create(stamp)?;
+            stamp.create_file_anyhow()?;
         }
 
         status.exit();

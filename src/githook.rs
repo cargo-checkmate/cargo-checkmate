@@ -72,13 +72,12 @@ pub fn get_path() -> anyhow::Result<PathBuf> {
 
 #[cfg(unix)]
 fn make_executable(p: &Path) -> anyhow::Result<()> {
-    use anyhow::Context;
     use std::os::unix::fs::PermissionsExt;
 
     let mut perms = p.metadata_anyhow()?.permissions();
     // Set user read/execute perms on unix:
     perms.set_mode(perms.mode() | 0o500);
-    std::fs::set_permissions(p, perms).with_context(|| format!("-for path {:?}", p.display()))?;
+    p.set_permissions_anyhow(perms)?;
     Ok(())
 }
 
