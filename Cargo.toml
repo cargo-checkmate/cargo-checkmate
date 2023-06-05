@@ -20,4 +20,5 @@ include_dir = "0.7.3"
 indoc = "2.0.1"
 
 [dev-dependencies]
+tempfile = "3.5.0"
 test-case = "2.2.2"
