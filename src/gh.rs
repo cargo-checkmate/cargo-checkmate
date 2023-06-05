@@ -1,3 +1,4 @@
+use crate::cdcrate::change_directory_to_crate_root;
 use crate::executable::Executable;
 use anyhow_std::PathAnyhow;
 use std::path::{Path, PathBuf};
@@ -31,6 +32,8 @@ impl Executable for Gh {
 }
 
 pub fn install() -> anyhow::Result<()> {
+    change_directory_to_crate_root()?;
+
     let p = get_path();
     println!("Installing: {:?}", p.display());
     p.write_anyhow(CONTENTS)?;
@@ -38,6 +41,8 @@ pub fn install() -> anyhow::Result<()> {
 }
 
 pub fn uninstall() -> anyhow::Result<()> {
+    change_directory_to_crate_root()?;
+
     let p = get_path();
     println!("Uninstalling (deleting): {:?}", p.display());
     p.remove_file_anyhow()

@@ -32,6 +32,7 @@ impl Phase {
 
         let everything: Vec<Phase> = Phase::list().collect();
 
+        crate::cdcrate::change_directory_to_crate_root()?;
         let mut runner = Runner::new()?;
 
         println!(
@@ -87,6 +88,7 @@ impl Executable for Phase {
         use crate::subcommands::{audit, cargo_builtin};
         use Phase::*;
 
+        crate::cdcrate::change_directory_to_crate_root()?;
         match self {
             Audit(opts) => audit(opts.force),
             Build => cargo_builtin(&["build"]),
