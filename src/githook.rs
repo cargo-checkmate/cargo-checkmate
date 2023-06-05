@@ -83,29 +83,49 @@ fn make_executable(p: &Path) -> anyhow::Result<()> {
 }
 
 fn check_dirty() -> anyhow::Result<()> {
-    use indoc::indoc;
+    let dirty = get_git_unstaged()?;
+    git_unstaged_to_error_message(dirty)?;
+    Ok(())
+}
 
+fn get_git_unstaged() -> anyhow::Result<Vec<String>> {
     let output = git::run(&["status", "--porcelain"])?;
+    parse_git_status_porcelain(&output)
+}
+
+fn parse_git_status_porcelain(output: &str) -> anyhow::Result<Vec<String>> {
     let mut dirty = vec![];
     for line in output.lines() {
-        if line.chars().nth(1) != Some(' ') {
-            dirty.push(line);
+        if line.is_char_boundary(3) {
+            let (info, content) = line.split_at(3);
+            if info.chars().nth(1) != Some(' ') {
+                dirty.push(content.to_string());
+            }
+        } else {
+            anyhow::bail!("unexpected output of `git status --porcelain`: {line:?}");
         }
     }
+    Ok(dirty)
+}
+
+fn git_unstaged_to_error_message(dirty: Vec<String>) -> anyhow::Result<()> {
+    use indoc::indoc;
     if dirty.is_empty() {
         Ok(())
     } else {
-        println!();
-        println!("These changes are not staged in git:");
-        for line in dirty {
-            println!("  {}", line.get(3..).unwrap());
-        }
-        println!();
-        println!(indoc! { "
-            The checkmate tool validates the current filesystem, but something different is staged for git commit. Since checkmate cannot validate the commit contents, this git hook is aborting.
+        Err(anyhow::anyhow!(
+            "These files have changes that are not staged in git:\n  {}",
+            dirty.join("\n  "),
+        )
+        .context(indoc! { r#"
+            The checkmate tool validates the current filesystem, but something different
+            is staged for git commit. Since checkmate cannot validate the commit contents,
+            this git hook is aborting.
 
             To save unstaged changes for after a commit, see `git stash`.
-        "});
-        Err(anyhow::anyhow!("mixed git commit"))
+        "# }))
     }
 }
+
+#[cfg(test)]
+mod tests;
