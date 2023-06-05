@@ -14,14 +14,14 @@ const RUN_CLIPPY: Options = Options {
     ; "checkmate-exec-no-args"
 )]
 #[test_case(
-    &["cargo", "checkmate"]
+    &["cargo-checkmate", "checkmate"]
     => Ok(Options { cmd: None })
-    ; "cargo-checkmate-no-args"
+    ; "checkmate-checkmate-no-args"
 )]
 #[test_case(
-    &["cargo", "checkmate", "run"]
+    &["cargo-checkmate", "checkmate", "run"]
     => Ok(Options { cmd: Some(Run { phase: None })})
-    ; "cargo-checkmate-run"
+    ; "checkmate-checkmate-run"
 )]
 #[test_case(
     &["cargo-checkmate", "run", "clippy"]
@@ -29,39 +29,39 @@ const RUN_CLIPPY: Options = Options {
     ; "checkmate-clippy"
 )]
 #[test_case(
-    &["cargo", "checkmate", "run", "clippy"]
+    &["cargo-checkmate", "checkmate", "run", "clippy"]
     => Ok(RUN_CLIPPY)
-    ; "cargo-checkmate-clippy"
+    ; "checkmate-checkmate-clippy"
 )]
 #[test_case(
-    &["/path/to/cargo", "checkmate", "run", "clippy"]
+    &["/path/to/cargo-checkmate", "checkmate", "run", "clippy"]
     => Ok(RUN_CLIPPY)
     ; "cargopath-checkmate-clippy"
 )]
 // This case should not occur in the wild, but will still parse:
 #[test_case(
-    &["cargo", "../foo/weird/checkmate", "run", "clippy"]
-    => Ok(RUN_CLIPPY)
+    &["cargo-checkmate", "../foo/weird/checkmate", "run", "clippy"]
+    => Err(r#"error: unrecognized subcommand '../foo/weird/checkmate'"#.to_string())
     ; "cargo-checkmateweirdpath-clippy"
 )]
 #[test_case(
-    &["cargo", "checkmate", "--help"] 
+    &["cargo-checkmate", "checkmate", "--help"] 
     => Err(env!("CARGO_PKG_DESCRIPTION").trim().to_string())
-    ; "cargo-checkmate-help"
+    ; "checkmate-checkmate-help"
 )]
 #[test_case(
     &[]
-    => Err(r#"error: expecting one of ["cargo", "cargo-checkmate"]; found nothing"#.to_string())
+    => Err(r#"error: expecting "cargo-checkmate"; found nothing"#.to_string())
     ; "empty-args"
 )]
 #[test_case(
     &["foob"]
-    => Err(r#"error: expecting one of ["cargo", "cargo-checkmate"]; found "foob""#.to_string())
+    => Err(r#"error: expecting "cargo-checkmate"; found "foob""#.to_string())
     ; "foob-bin"
 )]
 #[test_case(
-    &["cargo", "bork"]
-    => Err(r#"error: expecting one of ["checkmate"]; found "bork""#.to_string())
+    &["cargo-checkmate", "bork"]
+    => Err(r#"error: unrecognized subcommand 'bork'"#.to_string())
     ; "cargo-bork-bin"
 )]
 fn parse(args: &[&str]) -> Result<Options, String> {

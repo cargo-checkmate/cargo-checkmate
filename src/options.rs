@@ -42,7 +42,7 @@ impl Options {
     pub fn parse_args<I, T>(it: I) -> Options
     where
         I: IntoIterator<Item = T>,
-        T: Into<OsString> + Clone,
+        OsString: From<T>,
     {
         Self::unwrap_parse_result(Self::try_parse_args(it))
     }
@@ -50,13 +50,12 @@ impl Options {
     pub fn try_parse_args<I, T>(it: I) -> clap::error::Result<Options>
     where
         I: IntoIterator<Item = T>,
-        T: Into<OsString> + Clone,
+        OsString: From<T>,
     {
         use clap::Parser;
 
-        let mut it = it.into_iter().map(|s| s.into());
-        skip_binary_names(&mut it)?;
-        Self::try_parse_from(it)
+        let args = skip_binary_names(it)?;
+        Self::try_parse_from(args)
     }
 
     pub fn unwrap_parse_result(optsres: clap::error::Result<Options>) -> Options {
@@ -95,50 +94,41 @@ impl Executable for List {
     }
 }
 
-fn skip_binary_names<I>(args: &mut I) -> clap::error::Result<()>
+fn skip_binary_names<I, T>(args: I) -> clap::error::Result<Vec<OsString>>
 where
-    I: Iterator<Item = OsString>,
-{
-    let bin = expect_arg(&["cargo", "cargo-checkmate"], args)?;
-
-    if bin == "cargo" {
-        expect_arg(&["checkmate"], args)?;
-    }
-    Ok(())
-}
-
-fn expect_arg<I>(expecting: &[&str], args: &mut I) -> clap::error::Result<OsString>
-where
-    I: Iterator<Item = OsString>,
+    I: IntoIterator<Item = T>,
+    OsString: From<T>,
 {
     use clap::error::Error;
-    use clap::error::ErrorKind::{InvalidSubcommand, MissingSubcommand};
+    use clap::error::ErrorKind::{self, InvalidSubcommand, MissingSubcommand};
     use std::path::Path;
 
-    let arg = args.next().ok_or_else(|| {
+    fn mk_err(kind: ErrorKind, detail: &str) -> Error {
         Error::raw(
-            MissingSubcommand,
-            format!("expecting one of {expecting:?}; found nothing"),
+            kind,
+            format!(r#"expecting "cargo-checkmate"; found {detail}"#),
         )
-    })?;
-
-    let file_name = Path::new(arg.as_os_str()).file_name().ok_or_else(|| {
-        Error::raw(
-            InvalidSubcommand,
-            format!("expecting one of {expecting:?}; found {arg:?}"),
-        )
-    })?;
-
-    for expected in expecting {
-        if file_name == *expected {
-            return Ok(file_name.to_os_string());
-        }
     }
 
-    Err(Error::raw(
-        InvalidSubcommand,
-        format!("expecting one of {expecting:?}; found {arg:?}"),
-    ))
+    let mut args = args.into_iter().map(OsString::from).peekable();
+
+    let arg = args
+        .next()
+        .ok_or_else(|| mk_err(MissingSubcommand, "nothing"))?;
+
+    let file_name = Path::new(arg.as_os_str())
+        .file_name()
+        .ok_or_else(|| mk_err(InvalidSubcommand, &format!("{arg:?}")))?;
+
+    if file_name != "cargo-checkmate" {
+        return Err(mk_err(InvalidSubcommand, &format!("{arg:?}")));
+    }
+
+    if let Some("checkmate") = args.peek().and_then(|s| s.to_str()) {
+        args.next();
+    }
+
+    Ok(args.collect())
 }
 
 #[cfg(test)]
