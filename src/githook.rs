@@ -1,4 +1,5 @@
 use crate::executable::Executable;
+use crate::git;
 use anyhow_std::PathAnyhow;
 use std::path::{Path, PathBuf};
 
@@ -51,8 +52,7 @@ pub fn run() -> anyhow::Result<()> {
     use crate::phase::Phase;
 
     println!("cargo checkmate git-hook:");
-
-    // TODO: Ensure the repo is clean first.
+    check_dirty()?;
     Phase::execute_everything()
 }
 
@@ -67,21 +67,65 @@ pub fn print_contents() -> anyhow::Result<()> {
 }
 
 pub fn get_path() -> anyhow::Result<PathBuf> {
-    crate::git::get_hook_path("pre-commit")
+    git::get_hook_path("pre-commit")
 }
 
-#[cfg(unix)]
+// TODO: implement for other platforms:
 fn make_executable(p: &Path) -> anyhow::Result<()> {
+    use anyhow::Context;
     use std::os::unix::fs::PermissionsExt;
 
     let mut perms = p.metadata_anyhow()?.permissions();
     // Set user read/execute perms on unix:
     perms.set_mode(perms.mode() | 0o500);
-    p.set_permissions_anyhow(perms)?;
+    std::fs::set_permissions(p, perms).with_context(|| format!("-for path {:?}", p.display()))?;
     Ok(())
 }
 
-#[cfg(not(unix))]
-fn make_executable(p: &Path) -> anyhow::Result<()> {
-    todo!("make_executable({p:?}) not implemented for this platform")
+fn check_dirty() -> anyhow::Result<()> {
+    let dirty = get_git_unstaged()?;
+    git_unstaged_to_error_message(dirty)?;
+    Ok(())
 }
+
+fn get_git_unstaged() -> anyhow::Result<Vec<String>> {
+    let output = git::run(&["status", "--porcelain"])?;
+    parse_git_status_porcelain(&output)
+}
+
+fn parse_git_status_porcelain(output: &str) -> anyhow::Result<Vec<String>> {
+    let mut dirty = vec![];
+    for line in output.lines() {
+        if line.is_char_boundary(3) {
+            let (info, content) = line.split_at(3);
+            if info.chars().nth(1) != Some(' ') {
+                dirty.push(content.to_string());
+            }
+        } else {
+            anyhow::bail!("unexpected output of `git status --porcelain`: {line:?}");
+        }
+    }
+    Ok(dirty)
+}
+
+fn git_unstaged_to_error_message(dirty: Vec<String>) -> anyhow::Result<()> {
+    use indoc::indoc;
+    if dirty.is_empty() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!(
+            "These files have changes that are not staged in git:\n  {}",
+            dirty.join("\n  "),
+        )
+        .context(indoc! { r#"
+            The checkmate tool validates the current filesystem, but something different
+            is staged for git commit. Since checkmate cannot validate the commit contents,
+            this git hook is aborting.
+
+            To save unstaged changes for after a commit, see `git stash`.
+        "# }))
+    }
+}
+
+#[cfg(test)]
+mod tests;

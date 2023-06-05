@@ -14,7 +14,7 @@ pub fn run(args: &[&str]) -> anyhow::Result<String> {
     std::io::stderr().write_all(errbytes)?;
 
     if gitout.status.success() && errbytes.is_empty() {
-        String::from_utf8(gitout.stdout).with_context(|| "git-dir not utf8".to_string())
+        String::from_utf8(gitout.stdout).with_context(|| "git output not utf8".to_string())
     } else {
         Err(anyhow::anyhow!(
             "git {} exit {}{}",

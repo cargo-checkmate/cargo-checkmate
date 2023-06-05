@@ -12,12 +12,12 @@ homepage = "https://github.com/cargo-checkmate/cargo-checkmate"
 [dependencies]
 abscissa_core = "0.6.0"
 anyhow = "1.0.70"
-anyhow-std = "0.1.4"
+anyhow-std = "0.1.2"
 cargo-audit = "0.17.4"
 clap = { version = "4.3.0", features = ["derive"] }
 colored = "2.0.0"
 include_dir = "0.7.3"
+indoc = "2.0.1"
 
 [dev-dependencies]
-indoc = "2.0.1"
 test-case = "2.2.2"
