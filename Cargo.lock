@@ -241,7 +241,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-checkmate"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "abscissa_core",
  "anyhow",
