@@ -39,11 +39,12 @@ pub enum Subcommand {
 pub struct List {}
 
 impl Options {
-    pub fn parse_std_args() -> Options {
-        match Self::try_parse_args(std::env::args()) {
-            Ok(opts) => opts,
-            Err(e) => e.exit(),
-        }
+    pub fn parse_args<I, T>(it: I) -> Options
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<OsString> + Clone,
+    {
+        Self::unwrap_parse_result(Self::try_parse_args(it))
     }
 
     pub fn try_parse_args<I, T>(it: I) -> clap::error::Result<Options>
@@ -56,6 +57,13 @@ impl Options {
         let mut it = it.into_iter().map(|s| s.into());
         skip_binary_names(&mut it)?;
         Self::try_parse_from(it)
+    }
+
+    pub fn unwrap_parse_result(optsres: clap::error::Result<Options>) -> Options {
+        match optsres {
+            Ok(opts) => opts,
+            Err(e) => e.exit(),
+        }
     }
 }
 

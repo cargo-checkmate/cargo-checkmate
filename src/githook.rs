@@ -1,3 +1,4 @@
+use crate::cdcrate::change_directory_to_crate_root;
 use crate::executable::Executable;
 use crate::git;
 use anyhow_std::PathAnyhow;
@@ -51,6 +52,8 @@ pub fn uninstall() -> anyhow::Result<()> {
 pub fn run() -> anyhow::Result<()> {
     use crate::phase::Phase;
 
+    change_directory_to_crate_root()?;
+
     println!("cargo checkmate git-hook:");
     check_dirty()?;
     Phase::execute_everything()
@@ -67,6 +70,8 @@ pub fn print_contents() -> anyhow::Result<()> {
 }
 
 pub fn get_path() -> anyhow::Result<PathBuf> {
+    change_directory_to_crate_root()?;
+
     git::get_hook_path("pre-commit")
 }
 
