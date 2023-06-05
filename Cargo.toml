@@ -1,6 +1,6 @@
 [package]
 name = "cargo-checkmate"
-version = "0.1.14"
+version = "0.1.15"
 authors = ["nathan <nathan+dev@electriccoin.co>"]
 edition = "2021"
 description = "checkmate checks all the things - comprehensive out-of-the-box safety & hygiene checks."
