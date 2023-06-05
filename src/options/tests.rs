@@ -34,14 +34,14 @@ const RUN_CLIPPY: Options = Options {
     ; "checkmate-checkmate-clippy"
 )]
 #[test_case(
-    &["/path/to/cargo", "checkmate", "run", "clippy"]
+    &["/path/to/cargo-checkmate", "checkmate", "run", "clippy"]
     => Ok(RUN_CLIPPY)
     ; "cargopath-checkmate-clippy"
 )]
 // This case should not occur in the wild, but will still parse:
 #[test_case(
-    &["cargo", "../foo/weird/checkmate", "run", "clippy"]
-    => Ok(RUN_CLIPPY)
+    &["cargo-checkmate", "../foo/weird/checkmate", "run", "clippy"]
+    => Err(r#"error: unrecognized subcommand '../foo/weird/checkmate'"#.to_string())
     ; "cargo-checkmateweirdpath-clippy"
 )]
 #[test_case(
@@ -51,17 +51,17 @@ const RUN_CLIPPY: Options = Options {
 )]
 #[test_case(
     &[]
-    => Err(r#"error: expecting one of ["cargo", "cargo-checkmate"]; found nothing"#.to_string())
+    => Err(r#"error: expecting "cargo-checkmate"; found nothing"#.to_string())
     ; "empty-args"
 )]
 #[test_case(
     &["foob"]
-    => Err(r#"error: expecting one of ["cargo", "cargo-checkmate"]; found "foob""#.to_string())
+    => Err(r#"error: expecting "cargo-checkmate"; found "foob""#.to_string())
     ; "foob-bin"
 )]
 #[test_case(
-    &["cargo", "bork"]
-    => Err(r#"error: expecting one of ["checkmate"]; found "bork""#.to_string())
+    &["cargo-checkmate", "bork"]
+    => Err(r#"error: unrecognized subcommand 'bork'"#.to_string())
     ; "cargo-bork-bin"
 )]
 fn parse(args: &[&str]) -> Result<Options, String> {

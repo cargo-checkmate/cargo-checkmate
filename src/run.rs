@@ -8,7 +8,7 @@ pub fn run() -> anyhow::Result<()> {
 pub fn run_with_args<I, T>(it: I) -> anyhow::Result<()>
 where
     I: IntoIterator<Item = T>,
-    T: Into<OsString> + Clone,
+    OsString: From<T>,
 {
     use crate::executable::Executable;
     use crate::options::Options;
