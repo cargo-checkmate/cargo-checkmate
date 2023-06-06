@@ -91,12 +91,12 @@ impl Executable for Phase {
         crate::cdcrate::change_directory_to_crate_root()?;
         match self {
             Audit(opts) => audit(opts.force),
-            Build => cargo_builtin(&["build"]),
-            Check => cargo_builtin(&["check"]),
-            Doc => cargo_builtin(&["doc"]),
-            Clippy => cargo_builtin(&["clippy"]),
-            Format => cargo_builtin(&["fmt", "--", "--check"]),
-            Test => cargo_builtin(&["test"]),
+            Build => cargo_builtin(["build"], []),
+            Check => cargo_builtin(["check"], []),
+            Doc => cargo_builtin(["doc"], [("RUSTDOCFLAGS", "-D warnings")]),
+            Clippy => cargo_builtin(["clippy"], []),
+            Format => cargo_builtin(["fmt", "--", "--check"], []),
+            Test => cargo_builtin(["test"], []),
         }
     }
 }
