@@ -21,4 +21,4 @@ jobs:
         with:
           tool: cargo-checkmate
       - uses: actions/checkout@v3
-      - run: cargo-checkmate ${{ matrix.phase }}
+      - run: cargo-checkmate run ${{ matrix.phase }}
