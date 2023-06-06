@@ -2,6 +2,7 @@
 #![forbid(unsafe_code)]
 
 mod cdcrate;
+mod duration;
 mod executable;
 mod gh;
 mod git;

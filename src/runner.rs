@@ -1,6 +1,7 @@
 mod phaseresult;
 
 use self::phaseresult::PhaseResult;
+use crate::duration::DurationTracker;
 use crate::phase::Phase;
 use anyhow::Result;
 use anyhow_std::PathAnyhow;
@@ -11,6 +12,7 @@ pub struct Runner {
     logdir: PathBuf,
     passes: Vec<PhaseResult>,
     fails: Vec<PhaseResult>,
+    dt: DurationTracker,
 }
 
 impl Runner {
@@ -27,6 +29,7 @@ impl Runner {
             logdir,
             passes: vec![],
             fails: vec![],
+            dt: DurationTracker::start(),
         })
     }
 
@@ -50,10 +53,13 @@ impl Runner {
             std::io::stdout().flush()?;
         }
 
+        let dt = DurationTracker::start();
         let output = Command::new(exec)
             .arg("run")
             .arg(phasename)
             .output_anyhow()?;
+
+        let duration = dt.finish().format_seconds();
 
         let relerrlog = self.rellog_path(phasename, "stderr");
         let reloutlog = self.rellog_path(phasename, "stdout");
@@ -63,13 +69,13 @@ impl Runner {
 
         let results = if output.status.success() {
             if output.stdout.starts_with(b"skipped:\n") {
-                println!("{}.", "skipped".green());
+                println!("{:7} in {}", "skipped".green(), duration);
             } else {
-                println!("{}.", "ok".green());
+                println!("{:7} in {}", "ok".green(), duration);
             }
             &mut self.passes
         } else {
-            println!("{}.", "FAILED".red());
+            println!("{:7} in {}", "FAILED".red(), duration);
             &mut self.fails
         };
 
@@ -79,6 +85,7 @@ impl Runner {
     }
 
     pub fn exit(self) -> Result<()> {
+        let duration = self.dt.finish();
         let passcount = self.passes.len();
         let failcount = self.fails.len();
 
@@ -95,11 +102,12 @@ impl Runner {
         };
 
         println!(
-            "\n{} result: {}. {} passed; {} failed",
+            "\n{} result: {}. {} passed; {} failed; total duration {}",
             env!("CARGO_PKG_NAME"),
             label,
             passcount,
             failcount,
+            duration.format_human(),
         );
 
         std::process::exit(exitstatus);

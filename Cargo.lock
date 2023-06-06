@@ -249,6 +249,7 @@ dependencies = [
  "cargo-audit",
  "clap 4.3.0",
  "colored",
+ "humantime",
  "include_dir",
  "indoc",
  "tempfile",
