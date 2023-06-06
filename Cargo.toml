@@ -16,6 +16,7 @@ anyhow-std = "0.1.2"
 cargo-audit = "0.17.4"
 clap = { version = "4.3.0", features = ["derive"] }
 colored = "2.0.0"
+humantime = "2.1.0"
 include_dir = "0.7.3"
 indoc = "2.0.1"
 
