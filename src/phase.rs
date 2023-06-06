@@ -36,7 +36,7 @@ impl Phase {
         let mut runner = Runner::new()?;
 
         println!(
-            "\nrunning {} {} validation",
+            "\nrunning {} {} validations",
             everything.len(),
             env!("CARGO_PKG_NAME")
         );
