@@ -5,8 +5,14 @@ use std::time::{Duration, SystemTime};
 
 const AUDIT_EXPIRATION_TIMEOUT_SECS: u64 = 60 * 60 * 3;
 
-pub fn cargo_builtin(args: &[&str]) -> anyhow::Result<()> {
-    let status = Command::new("cargo").args(args).status_anyhow()?;
+pub fn cargo_builtin<const K: usize, const L: usize>(
+    args: [&str; K],
+    envs: [(&str, &str); L],
+) -> anyhow::Result<()> {
+    let status = Command::new("cargo")
+        .args(args)
+        .envs(envs)
+        .status_anyhow()?;
     status.exit();
 }
 
