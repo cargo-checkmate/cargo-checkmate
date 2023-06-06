@@ -39,14 +39,10 @@ impl Runner {
 
         let exec = std::env::current_exe()?;
         let phasename = &phase.to_string();
-        let mut padded = phasename.to_string();
+        let phasename_width = Phase::max_phase_name_length();
+        let pkgname = env!("CARGO_PKG_NAME");
 
-        // Pad the phase name for column alignment:
-        for _ in phasename.chars().count()..Phase::max_phase_name_length() {
-            padded.push(' ');
-        }
-
-        print!("{} run {} ... ", env!("CARGO_PKG_NAME"), padded);
+        print!("{pkgname} run {phasename:phasename_width$} ... ");
 
         {
             use std::io::Write;
