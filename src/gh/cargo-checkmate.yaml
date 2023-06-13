@@ -7,4 +7,3 @@ on:
 jobs:
   phases:
     uses: cargo-checkmate/cargo-checkmate/.github/workflows/callee.yaml
-
