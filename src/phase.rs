@@ -16,14 +16,6 @@ pub enum Phase {
     Doc,
     /// `cargo clippy` lint checks.
     Clippy,
-    /// `cargo audit` security advisories across all dependencies.
-    Audit(AuditOptions),
-}
-
-#[derive(Debug, PartialEq, Eq, clap::Parser)]
-pub struct AuditOptions {
-    #[clap(short, long, help = "Force an audit check.")]
-    force: bool,
 }
 
 impl Phase {
@@ -52,16 +44,7 @@ impl Phase {
     pub fn list() -> impl Iterator<Item = Phase> {
         use Phase::*;
 
-        [
-            Check,
-            Format,
-            Clippy,
-            Build,
-            Test,
-            Doc,
-            Audit(AuditOptions { force: false }),
-        ]
-        .into_iter()
+        [Check, Format, Clippy, Build, Test, Doc].into_iter()
     }
 
     /// The maximum phase name in characters
@@ -85,12 +68,11 @@ impl Executable for Option<Phase> {
 
 impl Executable for Phase {
     fn execute(&self) -> anyhow::Result<()> {
-        use crate::subcommands::{audit, cargo_builtin};
+        use crate::subcommands::cargo_builtin;
         use Phase::*;
 
         crate::cdcrate::change_directory_to_crate_root()?;
         match self {
-            Audit(opts) => audit(opts.force),
             Build => cargo_builtin(["build"], []),
             Check => cargo_builtin(["check"], []),
             Doc => cargo_builtin(["doc"], [("RUSTDOCFLAGS", "-D warnings")]),
@@ -103,13 +85,6 @@ impl Executable for Phase {
 
 impl fmt::Display for Phase {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Phase::Audit(opts) => format!("audit{}", if opts.force { " (force)" } else { "" }),
-                _ => format!("{:?}", self).to_lowercase(),
-            }
-        )
+        format!("{self:?}").to_lowercase().fmt(f)
     }
 }
