@@ -2,6 +2,7 @@ use crate::executable::Executable;
 
 use std::fmt;
 
+// Note: You must update .github/workflows/callee.yaml's phase list if you change these.
 #[derive(Debug, PartialEq, Eq, clap::Parser)]
 pub enum Phase {
     /// `cargo check` syntax + type checking.

@@ -13,7 +13,8 @@ jobs:
   run-phase:
     strategy:
       matrix:
-        phase: [audit, build, check, clippy, doc, format, test]
+        # Update this with `cargo checkmate list`
+        phase: [check, format, clippy, build, test, doc]
     needs: cache-checkmate
     runs-on: ubuntu-latest
     steps:
