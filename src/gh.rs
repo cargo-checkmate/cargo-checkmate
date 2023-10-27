@@ -36,6 +36,7 @@ pub fn install() -> anyhow::Result<()> {
 
     let p = get_path();
     println!("Installing: {:?}", p.display());
+    p.parent_anyhow()?.create_dir_all_anyhow()?;
     p.write_anyhow(CONTENTS)?;
     Ok(())
 }
