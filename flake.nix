@@ -1,3 +1,10 @@
+# A nix flake for `cargo-checkmate`.
+#
+# Nix users can install `cargo-checkmate` with:
+#
+# ```
+# $ nix profile install 'github:cargo-checkmate/cargo-checkmate'
+# ```
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   inputs.nci.url = "github:yusdacra/nix-cargo-integration";
