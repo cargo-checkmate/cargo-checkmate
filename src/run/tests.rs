@@ -32,11 +32,14 @@ where
 }
 
 fn find_executable() -> anyhow::Result<PathBuf> {
-    try_find_executable("target")?.map(Ok).unwrap_or_else(|| Err(anyhow::anyhow!("could not find executable".to_string())))
+    try_find_executable("target")?
+        .map(Ok)
+        .unwrap_or_else(|| Err(anyhow::anyhow!("could not find executable".to_string())))
 }
 
 fn try_find_executable<P>(dir: P) -> anyhow::Result<Option<PathBuf>>
-where P: AsRef<Path>,
+where
+    P: AsRef<Path>,
 {
     for dirres in dir.as_ref().read_dir_anyhow()? {
         let dirent = dirres?;
