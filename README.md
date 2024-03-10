@@ -91,8 +91,8 @@ Error: Custom { kind: Other, error: "Unrecongized git-hook: \".git/hooks/pre-com
 If you use GitHub, you can install a GitHub Action which runs `cargo-checkmate` on each `push` and `pull_request` event:
 
 ```
-$ cargo checkmate github-ci install
-cargo-checkmate GitHub CI installed: "/path/to/your/crate/.github/workflows/cargo-checkmate.yaml"
+$ cargo checkmate gh install
+Installing: "/path/to/your/crate/.github/workflows/cargo-checkmate.yaml"
 ```
 
 You must commit this to your repository separately from this command.
