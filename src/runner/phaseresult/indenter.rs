@@ -56,7 +56,7 @@ impl<W: Write> Indenter<W> {
 
         self.f.write_all(chunk)?;
         if newline {
-            self.f.write_all(&[b'\n'])?;
+            self.f.write_all(b"\n")?;
         }
 
         Ok(chunk.len() + if newline { 1 } else { 0 })
