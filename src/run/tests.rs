@@ -52,7 +52,9 @@ where
         } else if md.is_file() {
             use anyhow_std::OsStrAnyhow;
 
-            if childpath.file_name_anyhow()?.to_str_anyhow()? == env!("CARGO_PKG_NAME") {
+            if childpath.file_stem_anyhow()?.to_str_anyhow()? == env!("CARGO_PKG_NAME")
+                && childpath.extension_anyhow()? == std::env::consts::EXE_EXTENSION
+            {
                 return Ok(Some(childpath.canonicalize_anyhow()?));
             }
         }

@@ -116,11 +116,13 @@ where
         .next()
         .ok_or_else(|| mk_err(MissingSubcommand, "nothing"))?;
 
-    let file_name = Path::new(arg.as_os_str())
+    let file_path = Path::new(arg.as_os_str());
+    let file_name = file_path
         .file_name()
         .ok_or_else(|| mk_err(InvalidSubcommand, &format!("{arg:?}")))?;
+    let extension = file_path.extension().unwrap_or_else(|| "".as_ref());
 
-    if file_name != "cargo-checkmate" {
+    if file_name != "cargo-checkmate" && extension != std::env::consts::EXE_EXTENSION {
         return Err(mk_err(InvalidSubcommand, &format!("{arg:?}")));
     }
 
