@@ -2,7 +2,7 @@ use crate::cdcrate::change_directory_to_crate_root;
 use crate::executable::Executable;
 use crate::git;
 use anyhow_std::PathAnyhow;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 const CONTENTS: &str = include_str!("githook/pre-commit.sh");
 
@@ -39,6 +39,7 @@ pub fn install() -> anyhow::Result<()> {
     let p = get_path()?;
     println!("Installing: {:?}", p.display());
     p.write_anyhow(CONTENTS)?;
+    #[cfg(target_family = "unix")]
     make_executable(&p)?;
     Ok(())
 }
@@ -75,8 +76,8 @@ pub fn get_path() -> anyhow::Result<PathBuf> {
     git::get_hook_path("pre-commit")
 }
 
-// TODO: implement for other platforms:
-fn make_executable(p: &Path) -> anyhow::Result<()> {
+#[cfg(target_family = "unix")]
+fn make_executable(p: &std::path::Path) -> anyhow::Result<()> {
     use anyhow::Context;
     use std::os::unix::fs::PermissionsExt;
 
